@@ -1,0 +1,1 @@
+<!-- Utilisez ce fichier pour fournir des instructions spécifiques à l'espace de travail à Copilot. Pour plus de détails, visitez https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
