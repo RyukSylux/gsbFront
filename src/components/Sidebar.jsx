@@ -29,8 +29,12 @@ const Sidebar = ({ isOpen, onClose }) => {
         </button>
         
         <div className="flex items-center mb-8">
-          <div className="w-8 h-8 bg-purple-600 rounded-lg mr-2"></div>
-          <span className="text-xl font-semibold">GSB</span>
+          <img 
+            src="/logoGSB.png" 
+            alt="GSB Logo" 
+            className="h-12 w-auto mr-2"
+          />
+          <span className="text-xl font-semibold text-[#2B84C3]">GSB</span>
         </div>
         
         <SearchBar />

@@ -4,18 +4,22 @@ import TableRow from './TableRow';
 import TableControls from './TableControls';
 import Pagination from './Pagination';
 
-const CustomersTable = ({ customers }) => {
+const CustomersTable = ({ customers, isAdmin }) => {
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="p-4">
-        <TableControls />
+        {isAdmin && <TableControls />}
         
         <div className="overflow-x-auto">
           <table className="w-full min-w-[700px]">
-            <TableHeader />
+            <TableHeader showUserInfo={isAdmin} />
             <tbody className="divide-y divide-gray-200">
               {customers.map((customer) => (
-                <TableRow key={customer.id} customer={customer} />
+                <TableRow 
+                  key={customer.id} 
+                  customer={customer} 
+                  showUserInfo={isAdmin}
+                />
               ))}
             </tbody>
           </table>

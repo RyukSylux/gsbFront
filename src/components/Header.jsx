@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Header = ({ onMenuClick }) => {
+const Header = ({ onMenuClick, pageTitle, userName }) => {
   return (
     <header className="mb-8">
       <div className="flex items-center mb-4">
@@ -12,14 +12,20 @@ const Header = ({ onMenuClick }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <nav className="flex text-gray-500 text-sm">
-          <span className="mr-2">Morgan Bourré</span>
-          <span className="mx-2">/</span>
-          <span>Tableau de bord</span>
-        </nav>
+        <div className="flex items-center">
+          <img 
+            src="/logoGSB.png" 
+            alt="GSB Logo" 
+            className="h-8 w-auto mr-3 hidden md:block"
+          />
+          <nav className="flex text-gray-500 text-sm">
+            <span className="mr-2">{userName}</span>
+            <span className="mx-2">/</span>
+            <span>Tableau de bord</span>
+          </nav>
+        </div>
       </div>
-      <h1 className="text-2xl font-semibold mb-4">Tableau de bord Admin</h1>
-      <h2 className="text-lg font-medium">Clients</h2>
+      <h1 className="text-2xl font-semibold mb-4 text-[#2B84C3]">{pageTitle}</h1>
     </header>
   );
 };

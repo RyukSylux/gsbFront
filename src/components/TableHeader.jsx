@@ -1,11 +1,16 @@
 import React from 'react';
 
-const TableHeader = () => {
+const TableHeader = ({ showUserInfo }) => {
   return (
     <thead className="bg-gray-50">
       <tr className="text-left text-sm text-gray-500">
-        <th className="py-3 px-4">Client</th>
-        <th className="py-3 px-4">Email</th>
+        {showUserInfo && (
+          <>
+            <th className="py-3 px-4">Client</th>
+            <th className="py-3 px-4">Email</th>
+          </>
+        )}
+        <th className="py-3 px-4">Référence</th>
         <th className="py-3 px-4">Date</th>
         <th className="py-3 px-4">Statut</th>
         <th className="py-3 px-4">Montant</th>
