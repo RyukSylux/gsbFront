@@ -7,7 +7,7 @@ const Pagination = () => {
         <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
-        Previous
+        Précédent
       </button>
       <div className="flex space-x-2 order-1 sm:order-2 overflow-x-auto">
         {[1, 2, 3, '...', 8, 9, 10].map((page, idx) => (
@@ -22,7 +22,7 @@ const Pagination = () => {
         ))}
       </div>
       <button className="text-sm text-gray-600 flex items-center order-3">
-        Next
+        Suivant
         <svg className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
