@@ -8,16 +8,16 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Vérifier le token au chargement
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (token) {
-          const userData = await authAPI.getCurrentUser();
-          setUser(userData);
-        }
+        // Récupérer les informations utilisateur du token
+        const userData = await authAPI.getCurrentUser();
+        console.log('Initial user data:', userData);
+        setUser(userData);
       } catch (err) {
-        console.error('Erreur d\'authentification:', err);
+        console.error('Auth init error:', err);
         localStorage.removeItem('token');
       } finally {
         setLoading(false);
@@ -30,32 +30,17 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setError(null);
-      const response = await authAPI.login(email, password);
-      const { token, user: userData } = response;
+      const { token, user: userData } = await authAPI.login(email, password);
+      console.log('Login successful:', { token, userData });
       
       localStorage.setItem('token', token);
       setUser(userData);
-      
       return userData;
     } catch (err) {
-      setError(err.message || 'Erreur lors de la connexion');
-      throw err;
-    }
-  };
-
-  const register = async (userData) => {
-    try {
-      setError(null);
-      const response = await authAPI.register(userData);
-      const { token, user: newUser } = response;
-      
-      localStorage.setItem('token', token);
-      setUser(newUser);
-      
-      return newUser;
-    } catch (err) {
-      setError(err.message || 'Erreur lors de l\'inscription');
-      throw err;
+      const errorMessage = err.message || 'Erreur lors de la connexion';
+      console.error('Login error:', errorMessage);
+      setError(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 
@@ -64,14 +49,16 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
   };
 
+  // Vérifier si l'utilisateur est admin en utilisant le rôle décodé du token
   const isAdmin = user?.role === 'admin';
+  console.log('Current user role:', user?.role);
+  console.log('Is admin?', isAdmin);
 
   return (
     <AuthContext.Provider value={{ 
       user, 
       login, 
-      logout, 
-      register,
+      logout,
       loading, 
       error,
       isAdmin 

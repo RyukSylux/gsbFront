@@ -1,16 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const { login, error } = useAuth();
+  const { login, error, user } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState('');
+
+  // Rediriger si l'utilisateur est déjà connecté
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,9 +34,10 @@ const SignIn = () => {
 
     try {
       await login(formData.email, formData.password);
-      navigate('/dashboard');
+      // La redirection se fera automatiquement grâce au useEffect
     } catch (err) {
-      setFormError(err.message || 'Une erreur est survenue lors de la connexion');
+      console.error('Erreur de connexion:', err);
+      setFormError(err.message || 'Identifiants invalides');
     } finally {
       setLoading(false);
     }
