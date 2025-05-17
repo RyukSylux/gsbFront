@@ -104,6 +104,16 @@ export const authAPI = {
     }
   },
 
+  deleteUser: async (email) => {
+    try {
+      const response = await api.delete(`/users/${email}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error.response?.data);
+      throw error;
+    }
+  },
+
   getBills: async () => {
     try {
       const response = await api.get('/bills');

@@ -13,9 +13,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  console.log('Current user:', user);
-  console.log('Is admin?', isAdmin);
-
   // Charger la liste des utilisateurs si admin
   useEffect(() => {
     const fetchUsers = async () => {
@@ -93,7 +90,7 @@ const Dashboard = () => {
       userId: 2
     },
     { 
-      id: 5, 
+      id: 6, 
       name: 'Lucie Meyer', 
       username: '@lucie', 
       email: 'lucie@meyer.fr', 
@@ -103,7 +100,7 @@ const Dashboard = () => {
       userId: 2
     },
     { 
-      id: 5, 
+      id: 7, 
       name: 'Lucie Meyer', 
       username: '@lucie', 
       email: 'lucie@meyer.fr', 
@@ -113,7 +110,7 @@ const Dashboard = () => {
       userId: 2
     },
     { 
-      id: 5, 
+      id: 8, 
       name: 'Lucie Meyer', 
       username: '@lucie', 
       email: 'lucie@meyer.fr', 
@@ -123,7 +120,7 @@ const Dashboard = () => {
       userId: 2
     },
     { 
-      id: 5, 
+      id: 9, 
       name: 'Lucie Meyer', 
       username: '@lucie', 
       email: 'lucie@meyer.fr', 
@@ -133,7 +130,7 @@ const Dashboard = () => {
       userId: 2
     },
     { 
-      id: 5, 
+      id: 10, 
       name: 'Lucie Meyer', 
       username: '@lucie', 
       email: 'lucie@meyer.fr', 
@@ -143,7 +140,7 @@ const Dashboard = () => {
       userId: 2
     },
     { 
-      id: 5, 
+      id: 11, 
       name: 'Lucie Meyer', 
       username: '@lucie', 
       email: 'lucie@meyer.fr', 
@@ -153,7 +150,7 @@ const Dashboard = () => {
       userId: 2
     },
     { 
-      id: 5, 
+      id: 12, 
       name: 'Lucie Meyer', 
       username: '@lucie', 
       email: 'lucie@meyer.fr', 
@@ -163,7 +160,7 @@ const Dashboard = () => {
       userId: 2
     },
     { 
-      id: 5, 
+      id: 13, 
       name: 'Lucie Meyer', 
       username: '@lucie', 
       email: 'lucie@meyer.fr', 
@@ -173,7 +170,7 @@ const Dashboard = () => {
       userId: 2
     },
     { 
-      id: 5, 
+      id: 14, 
       name: 'Lucie Meyer', 
       username: '@lucie', 
       email: 'lucie@meyer.fr', 
@@ -183,7 +180,27 @@ const Dashboard = () => {
       userId: 2
     },
     { 
-      id: 5, 
+      id: 15, 
+      name: 'Lucie Meyer', 
+      username: '@lucie', 
+      email: 'lucie@meyer.fr', 
+      date: '14 mai 2025', 
+      status: 'Payé', 
+      amount: '96,32 €',
+      userId: 2
+    },
+    { 
+      id: 16, 
+      name: 'Lucie Meyer', 
+      username: '@lucie', 
+      email: 'lucie@meyer.fr', 
+      date: '14 mai 2025', 
+      status: 'Payé', 
+      amount: '96,32 €',
+      userId: 2
+    },
+    { 
+      id: 17, 
       name: 'Lucie Meyer', 
       username: '@lucie', 
       email: 'lucie@meyer.fr', 
@@ -202,6 +219,10 @@ const Dashboard = () => {
   const pageTitle = user?.role === 'admin' 
     ? "Toutes les factures" 
     : "Mes factures";
+
+  const handleUserDeleted = (deletedEmail) => {
+    setUsers(prevUsers => prevUsers.filter(user => user.email !== deletedEmail));
+  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -228,7 +249,7 @@ const Dashboard = () => {
                   {loading ? (
                     <div className="text-center py-4">Chargement des utilisateurs...</div>
                   ) : (
-                    <UsersTable users={users} />
+                    <UsersTable users={users} onUserDeleted={handleUserDeleted} />
                   )}
                 </div>
                 

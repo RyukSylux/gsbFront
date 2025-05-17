@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Vérifier le token au chargement
   useEffect(() => {
@@ -16,6 +17,7 @@ export const AuthProvider = ({ children }) => {
         const userData = await authAPI.getCurrentUser();
         console.log('Initial user data:', userData);
         setUser(userData);
+        setIsAdmin(userData.role === 'admin');
       } catch (err) {
         console.error('Auth init error:', err);
         localStorage.removeItem('token');
@@ -35,6 +37,7 @@ export const AuthProvider = ({ children }) => {
       
       localStorage.setItem('token', token);
       setUser(userData);
+      setIsAdmin(userData.role === 'admin');
       return userData;
     } catch (err) {
       const errorMessage = err.message || 'Erreur lors de la connexion';
@@ -46,23 +49,62 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    setIsAdmin(false);
     localStorage.removeItem('token');
   };
 
-  // Vérifier si l'utilisateur est admin en utilisant le rôle décodé du token
-  const isAdmin = user?.role === 'admin';
-  console.log('Current user role:', user?.role);
-  console.log('Is admin?', isAdmin);
+  const register = async (userData) => {
+    try {
+      const response = await authAPI.register(userData);
+      setUser(response.data);
+      setIsAdmin(response.data.role === 'admin');
+      setError(null);
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Une erreur est survenue lors de l\'inscription';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const deleteUser = async (email) => {
+    try {
+      await authAPI.deleteUser(email);
+      setError(null);
+      return true;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Erreur lors de la suppression de l\'utilisateur';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const updateUser = async (email, userData) => {
+    try {
+      const updatedUser = await authAPI.updateUser(email, userData);
+      setError(null);
+      return updatedUser;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Erreur lors de la mise à jour de l\'utilisateur';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const value = {
+    user,
+    error,
+    isAdmin,
+    register,
+    deleteUser,
+    updateUser,
+    loading,
+    login,
+    logout
+  };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      login, 
-      logout,
-      loading, 
-      error,
-      isAdmin 
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
@@ -75,3 +117,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export default AuthContext;

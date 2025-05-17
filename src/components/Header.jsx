@@ -17,8 +17,12 @@ const Header = ({ onMenuClick, pageTitle, userName }) => {
             src="/logoGSB.png" 
             alt="GSB Logo" 
             className="h-8 w-auto mr-3 hidden md:block"
-          />
-          <nav className="flex text-gray-500 text-sm">
+          />          <nav className="flex items-center text-gray-500 text-sm">
+            <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
+              <span className="text-indigo-600 font-medium">
+                {userName ? userName.charAt(0).toUpperCase() : '?'}
+              </span>
+            </div>
             <span className="mr-2">{userName}</span>
             <span className="mx-2">/</span>
             <span>Tableau de bord</span>
