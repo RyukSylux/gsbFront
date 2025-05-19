@@ -10,7 +10,7 @@ const TableHeader = ({ showUserInfo }) => {
             <th className="py-3 px-4">Email</th>
           </>
         )}
-        <th className="py-3 px-4">Référence</th>
+        <th className="py-3 px-4">Description</th>
         <th className="py-3 px-4">Date</th>
         <th className="py-3 px-4">Statut</th>
         <th className="py-3 px-4">Montant</th>

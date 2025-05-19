@@ -3,6 +3,8 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import CustomersTable from '../components/CustomersTable';
 import UsersTable from '../components/UsersTable';
+import BillModal from '../components/BillModal';
+import NewBillModal from '../components/NewBillModal';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
 
@@ -10,8 +12,14 @@ const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, isAdmin } = useAuth();
   const [users, setUsers] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [billsError, setBillsError] = useState(null);
+  const [billsLoading, setBillsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNewBillModalOpen, setIsNewBillModalOpen] = useState(false);
+  const [selectedBill, setSelectedBill] = useState(null);
 
   // Charger la liste des utilisateurs si admin
   useEffect(() => {
@@ -37,191 +45,61 @@ const Dashboard = () => {
     fetchUsers();
   }, [isAdmin]);
 
-  // Données de test (à remplacer par des données réelles de l'API)
-  const allCustomers = [
-    { 
-      id: 1, 
-      name: 'Lily-Rose Chedjou', 
-      username: '@lilyrose',
-      email: 'lilyrose@gmail.com', 
-      date: '15 mai 2025', 
-      status: 'Payé', 
-      amount: '100,14 €',
-      userId: 1
-    },
-    { 
-      id: 2, 
-      name: 'Catherine Dubois', 
-      username: '@catherine', 
-      email: 'catherine@dubois.fr', 
-      date: '15 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 3, 
-      name: 'Florence Martin', 
-      username: '@florence', 
-      email: 'florence@gmail.com', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '104,24 €',
-      userId: 1
-    },
-    { 
-      id: 4, 
-      name: 'Marc Bernard', 
-      username: '@marc', 
-      email: 'marc@bernard.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '88,48 €',
-      userId: 3
-    },
-    { 
-      id: 5, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 6, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 7, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 8, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 9, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 10, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 11, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 12, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 13, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 14, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 15, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 16, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-    { 
-      id: 17, 
-      name: 'Lucie Meyer', 
-      username: '@lucie', 
-      email: 'lucie@meyer.fr', 
-      date: '14 mai 2025', 
-      status: 'Payé', 
-      amount: '96,32 €',
-      userId: 2
-    },
-  ];
+  // Charger les factures
+  const fetchBills = async () => {
+    setBillsLoading(true);
+    try {
+      const billsData = await authAPI.getBills(isAdmin ? null : user?.id);
+      console.log('Factures reçues:', billsData);
+      setCustomers(billsData);
+    } catch (err) {
+      console.error('Erreur lors du chargement des factures:', err);
+      setBillsError('Impossible de charger les factures');
+    } finally {
+      setBillsLoading(false);
+    }
+  };
 
-  // Filtrer les factures selon le rôle de l'utilisateur
-  const customers = user?.role === 'admin' 
-    ? allCustomers 
-    : allCustomers.filter(customer => customer.userId === user?.id);
-
-  const pageTitle = user?.role === 'admin' 
-    ? "Toutes les factures" 
-    : "Mes factures";
+  useEffect(() => {
+    if (user) {
+      fetchBills();
+    }
+  }, [user, isAdmin]);
 
   const handleUserDeleted = (deletedEmail) => {
     setUsers(prevUsers => prevUsers.filter(user => user.email !== deletedEmail));
+  };
+
+  const handleBillClick = (bill) => {
+    setSelectedBill(bill);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setSelectedBill(null);
+    setIsModalOpen(false);
+  };
+
+  const handleBillSaved = () => {
+    fetchBills();
+    handleModalClose();
+  };
+
+  const handleNewBill = () => {
+    setIsNewBillModalOpen(true);
+  };
+
+  const handleNewBillModalClose = () => {
+    setIsNewBillModalOpen(false);
+  };
+
+  const handleNewBillSaved = () => {
+    fetchBills();
+    handleNewBillModalClose();
+  };
+
+  const handleBillsDeleted = () => {
+    fetchBills();
   };
 
   return (
@@ -253,14 +131,45 @@ const Dashboard = () => {
                   )}
                 </div>
                 
-                <h2 className="text-lg font-medium mb-4">Toutes les factures</h2>
+                <div className="mb-4">
+                  <h2 className="text-lg font-medium">Toutes les factures</h2>
+                </div>
               </>
             )}
             
-            <CustomersTable customers={customers} isAdmin={isAdmin} />
+            {billsError && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+                {billsError}
+              </div>
+            )}
+            
+            {billsLoading ? (
+              <div className="text-center py-4">Chargement des factures...</div>
+            ) : (
+              <CustomersTable 
+                customers={customers} 
+                isAdmin={isAdmin} 
+                onBillClick={handleBillClick}
+                onNewBill={handleNewBill}
+                onBillsDeleted={handleBillsDeleted}
+              />
+            )}
           </div>
         </div>
       </main>
+
+      <BillModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSave={handleBillSaved}
+        initialData={selectedBill}
+      />
+
+      <NewBillModal
+        isOpen={isNewBillModalOpen}
+        onClose={handleNewBillModalClose}
+        onSave={handleNewBillSaved}
+      />
     </div>
   );
 };

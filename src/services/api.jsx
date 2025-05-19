@@ -119,6 +119,100 @@ export const authAPI = {
       const response = await api.get('/bills');
       return response.data;
     } catch (error) {
+      console.error('Erreur lors de la récupération des factures:', error);
+      throw error.response?.data || error.message;
+    }
+  },
+
+  getBillProof: async (billId) => {
+    try {
+      const response = await api.get(`/bills/${billId}/proof`, {
+        responseType: 'blob'
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la récupération du justificatif:', error);
+      throw error.response?.data || error.message;
+    }
+  },
+
+  createBill: async (billData) => {
+    try {
+      const formData = new FormData();
+      
+      // On ajoute les metadata en JSON
+      formData.append('metadata', JSON.stringify(billData.metadata));
+
+      // On ajoute le fichier proof
+      if (billData.proof) {
+        formData.append('proof', billData.proof);
+      }
+
+      const response = await api.post('/bills', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la création de la facture:', error);
+      throw error.response?.data || error.message;
+    }
+  },
+
+  updateBill: async (billId, billData) => {
+    try {
+      const formData = new FormData();
+      
+      // On crée l'objet metadata
+      const metadata = {
+        description: billData.description,
+        amount: billData.amount,
+        status: billData.status,
+        type: billData.type,
+        date: billData.date
+      };
+
+      // On ajoute les metadata en JSON
+      formData.append('metadata', JSON.stringify(metadata));
+
+      // Si on a un nouveau fichier proof
+      if (billData.proof instanceof File) {
+        formData.append('proof', billData.proof);
+      }
+
+      const response = await api.put(`/bills/${billId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la facture:', error);
+      throw error.response?.data || error.message;
+    }
+  },
+
+  deleteBill: async (billId) => {
+    try {
+      const response = await api.delete(`/bills/${billId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la facture:', error);
+      throw error.response?.data || error.message;
+    }
+  },
+
+  deleteManyBills: async (billIds) => {
+    try {
+      const response = await api.delete('/bills/many', {
+        data: {
+          ids: billIds
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la suppression multiple des factures:', error);
       throw error.response?.data || error.message;
     }
   }
