@@ -75,20 +75,29 @@ export const authAPI = {
     } catch (error) {
       throw error.response?.data || error;
     }
-  },
-  updateUser: async (currentEmail, userData) => {
+  },  updateUser: async (currentEmail, userData) => {
     try {
-      // Transformer password en newPassword si présent
-      const transformedData = { ...userData };
-      if (transformedData.password) {
-        transformedData.newPassword = transformedData.password;
-        delete transformedData.password;
-      }
-      if (transformedData.email) {
-        transformedData.newEmail = transformedData.email;
-        delete transformedData.email;
+      // On crée un nouvel objet avec les données transformées
+      const transformedData = {};
+
+      // Ajout des champs s'ils sont présents
+      if (userData.name) transformedData.name = userData.name;
+      if (userData.description) transformedData.description = userData.description;
+      if (userData.role) transformedData.role = userData.role;
+
+      // Gestion spéciale de l'email (transformation en newEmail)
+      if (userData.email && userData.email !== currentEmail) {
+        transformedData.newEmail = userData.email;
+      }      // Gestion du mot de passe
+      if (userData.newPassword) {
+        transformedData.newPassword = userData.newPassword;
+        // On n'ajoute le mot de passe actuel que s'il est fourni
+        if (userData.currentPassword) {
+          transformedData.currentPassword = userData.currentPassword;
+        }
       }
 
+      console.log('Données envoyées pour mise à jour:', transformedData);
       const response = await api.put(`/users/${currentEmail}`, transformedData);
       return response.data;
     } catch (error) {

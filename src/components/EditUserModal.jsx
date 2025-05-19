@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
+  const { isAdmin } = useAuth();
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -35,7 +37,8 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
         setError('Les mots de passe ne correspondent pas');
         return;
       }
-      if (!formData.currentPassword) {
+      // Vérifier le mot de passe actuel seulement si non admin
+      if (!isAdmin && !formData.currentPassword) {
         setError('Le mot de passe actuel est requis pour changer le mot de passe');
         return;
       }
@@ -46,14 +49,31 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
         name: formData.name,
         email: formData.email !== user.email ? formData.email : undefined,
         description: formData.description,
-        role: formData.role,
-        ...(formData.newPassword && {
-          currentPassword: formData.currentPassword,
-          newPassword: formData.newPassword
-        })
+        role: formData.role
       };
 
+      // Ajouter le nouveau mot de passe si fourni
+      if (formData.newPassword) {
+        updateData.newPassword = formData.newPassword;
+        // Ajouter le mot de passe actuel seulement si non admin
+        if (!isAdmin && formData.currentPassword) {
+          updateData.currentPassword = formData.currentPassword;
+        }
+      }
+      
+      // Appeler onSave et attendre le résultat
       await onSave(updateData);
+      
+      // Réinitialiser le formulaire et fermer le modal
+      setFormData({
+        name: '',
+        email: '',
+        description: '',
+        role: 'user',
+        currentPassword: '',
+        newPassword: '',
+        confirmNewPassword: ''
+      });
       onClose();
     } catch (err) {
       setError(err.message);
@@ -128,21 +148,21 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
               <option value="user">Utilisateur</option>
               <option value="admin">Administrateur</option>
             </select>
-          </div>
-
-          <div className="border-t border-gray-200 my-4 pt-4">
+          </div>          <div className="border-t border-gray-200 my-4 pt-4">
             <h3 className="font-medium text-gray-700 mb-2">Changer le mot de passe (optionnel)</h3>
             
-            <div className="mb-4">
-              <label className="block font-medium text-gray-700 mb-2">Mot de passe actuel</label>
-              <input
-                type="password"
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              />
-            </div>
+            {!isAdmin && (
+              <div className="mb-4">
+                <label className="block font-medium text-gray-700 mb-2">Mot de passe actuel</label>
+                <input
+                  type="password"
+                  name="currentPassword"
+                  value={formData.currentPassword}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                />
+              </div>
+            )}
 
             <div className="mb-4">
               <label className="block font-medium text-gray-700 mb-2">Nouveau mot de passe</label>

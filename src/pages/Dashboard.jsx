@@ -66,8 +66,15 @@ const Dashboard = () => {
     }
   }, [user, isAdmin]);
 
-  const handleUserDeleted = (deletedEmail) => {
-    setUsers(prevUsers => prevUsers.filter(user => user.email !== deletedEmail));
+  const handleUsersListChanged = (change) => {
+    if (change.type === 'delete') {
+      setUsers(prevUsers => prevUsers.filter(user => user.email !== change.user.email));
+    } else if (change.type === 'update') {
+      setUsers(prevUsers => prevUsers.map(user => 
+        // Si l'email correspond à l'ancien email de l'utilisateur
+        user.email === change.oldEmail ? change.user : user
+      ));
+    }
   };
 
   const handleBillClick = (bill) => {
@@ -127,7 +134,7 @@ const Dashboard = () => {
                   {loading ? (
                     <div className="text-center py-4">Chargement des utilisateurs...</div>
                   ) : (
-                    <UsersTable users={users} onUserDeleted={handleUserDeleted} />
+                    <UsersTable users={users} onUsersListChanged={handleUsersListChanged} />
                   )}
                 </div>
                 

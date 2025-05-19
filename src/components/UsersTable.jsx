@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import EditUserModal from './EditUserModal';
+import ConfirmModal from './ConfirmModal';
 
-const UsersTable = ({ users, onUserDeleted }) => {
+const UsersTable = ({ users, onUsersListChanged }) => {
   const { deleteUser, updateUser } = useAuth();
   const [deletingUser, setDeletingUser] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -15,37 +20,49 @@ const UsersTable = ({ users, onUserDeleted }) => {
     });
   };
 
-  const handleDelete = async (email) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-      try {
-        setDeletingUser(email);
-        await deleteUser(email);
-        if (onUserDeleted) {
-          onUserDeleted(email);
-        }
-      } catch (error) {
-        console.error('Erreur lors de la suppression:', error);
-      } finally {
-        setDeletingUser(null);
+  const handleDelete = (user) => {
+    setUserToDelete(user);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      setDeletingUser(userToDelete.email);
+      await deleteUser(userToDelete.email);
+      if (onUsersListChanged) {
+        onUsersListChanged({ type: 'delete', user: userToDelete });
       }
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error);
+      setErrorMessage(error.message || 'Une erreur est survenue lors de la suppression');
+      setShowErrorModal(true);
+    } finally {
+      setDeletingUser(null);
+      setShowDeleteConfirm(false);
+      setUserToDelete(null);
     }
   };
 
   const handleEdit = (user) => {
     setEditingUser(user);
   };
-
   const handleSave = async (updatedData) => {
     try {
-      const updatedUser = await updateUser(editingUser.email, updatedData);
-      // Mettre à jour la liste des utilisateurs
-      if (onUserDeleted) {
-        // On réutilise onUserDeleted pour forcer le rechargement de la liste
-        onUserDeleted(null);
+      const oldEmail = editingUser.email; // Sauvegarde de l'ancien email
+      const updatedUser = await updateUser(oldEmail, updatedData);
+      if (onUsersListChanged) {
+        onUsersListChanged({ 
+          type: 'update',
+          user: updatedUser,
+          oldEmail: oldEmail // On passe l'ancien email pour pouvoir identifier l'utilisateur à mettre à jour
+        });
       }
+      setEditingUser(null); // Fermer le modal
       return updatedUser;
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
+      setErrorMessage(error.message || 'Une erreur est survenue lors de la mise à jour');
+      setShowErrorModal(true);
       throw error;
     }
   };
@@ -104,7 +121,7 @@ const UsersTable = ({ users, onUserDeleted }) => {
                           </svg>
                         </button>
                         <button
-                          onClick={() => handleDelete(user.email)}
+                          onClick={() => handleDelete(user)}
                           disabled={deletingUser === user.email}
                           className="text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Supprimer l'utilisateur"
@@ -138,6 +155,27 @@ const UsersTable = ({ users, onUserDeleted }) => {
           onSave={handleSave}
         />
       )}
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title="Confirmer la suppression"
+        message={`Êtes-vous sûr de vouloir supprimer l'utilisateur ${userToDelete?.name} ? Cette action est irréversible.`}
+        onConfirm={confirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+        type="danger"
+        confirmText="Supprimer"
+        cancelText="Annuler"
+      />
+
+      <ConfirmModal
+        isOpen={showErrorModal}
+        title="Erreur"
+        message={errorMessage}
+        onConfirm={() => setShowErrorModal(false)}
+        onCancel={() => setShowErrorModal(false)}
+        type="warning"
+        confirmText="OK"
+      />
     </>
   );
 };
