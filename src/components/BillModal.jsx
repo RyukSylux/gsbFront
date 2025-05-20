@@ -13,6 +13,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     if (initialData) {
@@ -82,25 +83,33 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isAdmin) return;
+    if (!isAdmin || !isEditing) return;
 
     setLoading(true);
     setError('');
+    setSuccess('');
 
     try {
       const billData = {
         description: formData.description,
-        amount: Number(formData.amount),
-        status: formData.status,
-        proof: formData.proof instanceof File ? formData.proof : undefined
+        amount: parseFloat(formData.amount),
+        status: formData.status
       };
+
+      // Ajout du justificatif uniquement s'il a été modifié
+      if (formData.proof instanceof File) {
+        billData.proof = formData.proof;
+      }
 
       await authAPI.updateBill(initialData._id, billData);
       setIsEditing(false);
-      if (onSave) onSave();
+      setSuccess('Facture mise à jour avec succès');
+      if (onSave) {
+        onSave();
+      }
     } catch (err) {
-      console.error('Erreur de mise à jour:', err);
-      setError(err.message || 'Une erreur est survenue lors de la mise à jour');
+      console.error('Erreur lors de la mise à jour de la facture:', err);
+      setError(err.response?.data?.message || err.message || 'Une erreur est survenue lors de la mise à jour');
     } finally {
       setLoading(false);
     }
@@ -155,8 +164,13 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                 {error}
               </div>
             )}
+            {success && (
+              <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg">
+                {success}
+              </div>
+            )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form id="billForm" onSubmit={handleSubmit} className="space-y-4">
               {initialData?.proof && (
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -334,6 +348,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                   <button
                     type="submit"
                     form="billForm"
+                    onClick={handleSubmit}
                     className="px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                     disabled={loading}
                   >
