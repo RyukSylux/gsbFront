@@ -114,13 +114,15 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="fixed inset-0 flex items-center justify-center p-4">        <div 
-          className="bg-white rounded-lg w-full max-w-lg shadow-xl relative"
+      <div className="fixed inset-0 flex items-center justify-center p-2 sm:p-4">
+        <div 
+          className="bg-white rounded-lg w-full max-w-lg shadow-xl relative max-h-[95vh] flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="p-8">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-xl font-semibold">
+          {/* En-tête fixe */}
+          <div className="p-4 sm:p-6 border-b border-gray-200">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg sm:text-xl font-semibold">
                 Détails de la facture
               </h2>
               <div className="flex items-center space-x-2">
@@ -144,7 +146,10 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                 </button>
               </div>
             </div>
+          </div>
 
+          {/* Zone de défilement */}
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6">
             {error && (
               <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
                 {error}
@@ -157,7 +162,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Justificatif
                   </label>
-                  <div className="relative h-48 w-full overflow-hidden rounded-lg border border-gray-300">
+                  <div className="relative h-32 sm:h-48 w-full overflow-hidden rounded-lg border border-gray-300">
                     {initialData.proof.endsWith('.pdf') ? (
                       <div className="flex items-center justify-center h-full bg-gray-50">
                         <a
@@ -180,7 +185,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                       href={initialData.proof}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="absolute bottom-2 right-2 bg-white rounded-md shadow-sm px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 border border-gray-300"
+                      className="absolute bottom-2 right-2 bg-white rounded-md shadow-sm px-2 py-1 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 border border-gray-300"
                     >
                       Voir en plein écran
                     </a>
@@ -195,19 +200,21 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                         name="proof"
                         onChange={handleChange}
                         className="mt-1 block w-full text-sm text-gray-500
-                          file:mr-4 file:py-2 file:px-4
+                          file:mr-4 file:py-1.5 file:px-3
                           file:rounded-md file:border-0
-                          file:text-sm file:font-semibold
+                          file:text-xs file:font-semibold
                           file:bg-indigo-50 file:text-indigo-700
                           hover:file:bg-indigo-100"
                         accept="image/*,.pdf"
                       />
                     </div>
                   )}
-                </div>              )}
-              <div className="space-y-6">
+                </div>
+              )}
+
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Description
                   </label>
                   {isEditing ? (
@@ -216,14 +223,14 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                       name="description"
                       value={formData.description}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md"
                       required
                     />
                   ) : (
                     <input
                       type="text"
                       value={initialData?.description || ''}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
                       disabled
                     />
                   )}
@@ -239,7 +246,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                       name="amount"
                       value={formData.amount}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md"
                       required
                       step="0.01"
                     />
@@ -247,7 +254,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                     <input
                       type="text"
                       value={`${initialData?.amount || 0} €`}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
                       disabled
                     />
                   )}
@@ -260,7 +267,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                   <input
                     type="text"
                     value={formatDate(initialData?.date)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
                     disabled
                   />
                 </div>
@@ -274,7 +281,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                       name="status"
                       value={formData.status}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md"
                     >
                       <option value="pending">En attente</option>
                       <option value="paid">Payé</option>
@@ -282,7 +289,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                     </select>
                   ) : (
                     <div className="mt-1">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(initialData?.status)}`}>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(initialData?.status)}`}>
                         {getStatusLabel(initialData?.status)}
                       </span>
                     </div>
@@ -291,54 +298,58 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
               </div>
 
               {isAdmin && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="py-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Utilisateur
                   </label>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-indigo-600 font-medium">
                         {initialData?.name?.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{initialData?.name}</div>
-                      <div className="text-sm text-gray-500">{initialData?.email}</div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-gray-900 truncate">{initialData?.name}</div>
+                      <div className="text-sm text-gray-500 truncate">{initialData?.email}</div>
                     </div>
                   </div>
                 </div>
               )}
+            </form>
+          </div>
 
-              <div className="mt-6 flex justify-end space-x-3">
-                {isEditing ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => setIsEditing(false)}
-                      className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                      disabled={loading}
-                    >
-                      Annuler
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-                      disabled={loading}
-                    >
-                      {loading ? 'Enregistrement...' : 'Enregistrer'}
-                    </button>
-                  </>
-                ) : (
+          {/* Pied de page fixe avec les boutons */}
+          <div className="border-t border-gray-200 p-4 sm:p-6 bg-gray-50">
+            <div className="flex justify-end space-x-3">
+              {isEditing ? (
+                <>
                   <button
                     type="button"
-                    onClick={onClose}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    onClick={() => setIsEditing(false)}
+                    className="px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    disabled={loading}
                   >
-                    Fermer
+                    Annuler
                   </button>
-                )}
-              </div>
-            </form>
+                  <button
+                    type="submit"
+                    form="billForm"
+                    className="px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                    disabled={loading}
+                  >
+                    {loading ? 'Enregistrement...' : 'Enregistrer'}
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Fermer
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
