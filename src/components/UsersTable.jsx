@@ -32,9 +32,7 @@ const UsersTable = ({ users, onUsersListChanged }) => {
       if (onUsersListChanged) {
         onUsersListChanged({ type: 'delete', user: userToDelete });
       }
-    } catch (error) {
-      console.error('Erreur lors de la suppression:', error);
-      setErrorMessage(error.message || 'Une erreur est survenue lors de la suppression');
+    } catch (error) {      setErrorMessage(error.message || 'Une erreur est survenue lors de la suppression');
       setShowErrorModal(true);
     } finally {
       setDeletingUser(null);
@@ -59,9 +57,7 @@ const UsersTable = ({ users, onUsersListChanged }) => {
       }
       setEditingUser(null); // Fermer le modal
       return updatedUser;
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
-      setErrorMessage(error.message || 'Une erreur est survenue lors de la mise à jour');
+    } catch (error) {      setErrorMessage(error.message || 'Une erreur est survenue lors de la mise à jour');
       setShowErrorModal(true);
       throw error;
     }

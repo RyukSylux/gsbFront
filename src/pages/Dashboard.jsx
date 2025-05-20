@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import CustomersTable from '../components/CustomersTable';
@@ -14,7 +14,7 @@ const Dashboard = () => {
   const { user, isAdmin } = useAuth();
   const [users, setUsers] = useState([]);
   const [customers, setCustomers] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [billsError, setBillsError] = useState(null);
   const [billsLoading, setBillsLoading] = useState(false);
@@ -24,48 +24,38 @@ const Dashboard = () => {
 
   // Charger la liste des utilisateurs si admin
   useEffect(() => {
-    const fetchUsers = async () => {
-      if (isAdmin) {
-        console.log('Utilisateur est admin, chargement des utilisateurs...');
+    const fetchUsers = async () => {      if (isAdmin) {
         setLoading(true);
         try {
           const usersData = await authAPI.getAllUsers();
-          console.log('Données utilisateurs reçues:', usersData);
           setUsers(usersData);
         } catch (err) {
-          console.error('Erreur lors du chargement des utilisateurs:', err);
           setError('Impossible de charger la liste des utilisateurs');
         } finally {
           setLoading(false);
         }
-      } else {
-        console.log('Utilisateur n\'est pas admin');
       }
     };
 
     fetchUsers();
   }, [isAdmin]);
 
-  // Charger les factures
-  const fetchBills = async () => {
-    setBillsLoading(true);
-    try {
-      const billsData = await authAPI.getBills(isAdmin ? null : user?.id);
-      console.log('Factures reçues:', billsData);
-      setCustomers(billsData);
+  // Optimiser fetchBills avec useCallback pour éviter les re-rendus inutiles
+  const fetchBills = useCallback(async () => {
+    try {      setLoading(true);
+      setError(null);
+      const bills = await authAPI.getBills();
+      setCustomers(bills);
     } catch (err) {
-      console.error('Erreur lors du chargement des factures:', err);
-      setBillsError('Impossible de charger les factures');
+      setError('Erreur lors du chargement des factures');
     } finally {
-      setBillsLoading(false);
+      setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    if (user) {
-      fetchBills();
-    }
-  }, [user, isAdmin]);
+    fetchBills();
+  }, [fetchBills]);
 
   const handleUsersListChanged = (change) => {
     if (change.type === 'delete') {
@@ -88,14 +78,11 @@ const Dashboard = () => {
     setSelectedBill(null);
     setIsModalOpen(false);
   };
-
   const handleNewBill = () => {
-    console.log('Ouverture de la modale de nouvelle facture');
     setIsNewBillModalOpen(true);
   };
 
   const handleBillSaved = () => {
-    console.log('Facture sauvegardée, rafraîchissement des données');
     fetchBills();
     handleModalClose();
   };
@@ -108,17 +95,15 @@ const Dashboard = () => {
     fetchBills();
     handleNewBillModalClose();
   };
-
-  const handleBillsDeleted = () => {
-    console.log('Factures supprimées, rafraîchissement des données');
-    fetchBills();
-  };
+  const handleBillsDeleted = useCallback(async () => {
+    await fetchBills();
+  }, [fetchBills]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden pt-16">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         
         <div className="flex-1 overflow-x-auto">
@@ -143,7 +128,8 @@ const Dashboard = () => {
               <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                 <div className="p-6 border-b border-gray-200">
                   <h2 className="text-xl font-semibold text-gray-900">Gestion des Factures</h2>
-                </div>                <div className="p-4">
+                </div>
+                <div className="p-4">
                   <CustomersTable 
                     customers={customers}
                     isAdmin={isAdmin}

@@ -20,14 +20,11 @@ api.interceptors.request.use((config) => {
 
 export const authAPI = {
   login: async (email, password) => {
-    try {
-      const response = await api.post('/login', { email, password });
-      console.log('Login response:', response.data);
+    try {      const response = await api.post('/login', { email, password });
       
       if (response.data.token) {
         // Décodage du token JWT (partie payload)
         const payload = JSON.parse(atob(response.data.token.split('.')[1]));
-        console.log('Token payload:', payload);
         
         return {
           token: response.data.token,
@@ -35,35 +32,25 @@ export const authAPI = {
         };
       }
       throw new Error('Token non reçu');
-    } catch (error) {
-      console.error('Login error:', error.response?.data || error);
-      throw error.response?.data || error;
+    } catch (error) {      throw error.response?.data || error;
     }
   },
 
   getCurrentUser: async () => {
     const token = localStorage.getItem('token');
-    if (!token) throw new Error('Aucun token trouvé');
-
-    // Décodage du token JWT pour obtenir les informations utilisateur
+    if (!token) throw new Error('Aucun token trouvé');    // Décodage du token JWT pour obtenir les informations utilisateur
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      console.log('Current user from token:', payload);
       return payload;
     } catch (error) {
-      console.error('Token decode error:', error);
       throw new Error('Token invalide');
     }
   },
 
-  getAllUsers: async () => {
-    try {
-      console.log('Fetching all users...');
+  getAllUsers: async () => {    try {
       const response = await api.get('/users');
-      console.log('Users response:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Get users error:', error.response?.data || error);
       throw error.response?.data || error;
     }
   },
@@ -95,10 +82,7 @@ export const authAPI = {
         if (userData.currentPassword) {
           transformedData.currentPassword = userData.currentPassword;
         }
-      }
-
-      console.log('Données envoyées pour mise à jour:', transformedData);
-      const response = await api.put(`/users/${currentEmail}`, transformedData);
+      }      const response = await api.put(`/users/${currentEmail}`, transformedData);
       return response.data;
     } catch (error) {
       if (error.response?.status === 409) {
@@ -117,9 +101,7 @@ export const authAPI = {
     try {
       const response = await api.delete(`/users/${email}`);
       return response.data;
-    } catch (error) {
-      console.error('Erreur lors de la suppression:', error.response?.data);
-      throw error;
+    } catch (error) {      throw error;
     }
   },
 
@@ -127,9 +109,7 @@ export const authAPI = {
     try {
       const response = await api.get('/bills');
       return response.data;
-    } catch (error) {
-      console.error('Erreur lors de la récupération des factures:', error);
-      throw error.response?.data || error.message;
+    } catch (error) {      throw error.response?.data || error.message;
     }
   },
 
@@ -139,9 +119,7 @@ export const authAPI = {
         responseType: 'blob'
       });
       return response.data;
-    } catch (error) {
-      console.error('Erreur lors de la récupération du justificatif:', error);
-      throw error.response?.data || error.message;
+    } catch (error) {      throw error.response?.data || error.message;
     }
   },
 
@@ -163,9 +141,7 @@ export const authAPI = {
         }
       });
       return response.data;
-    } catch (error) {
-      console.error('Erreur lors de la création de la facture:', error);
-      throw error.response?.data || error.message;
+    } catch (error) {      throw error.response?.data || error.message;
     }
   },
 
@@ -196,33 +172,58 @@ export const authAPI = {
         }
       });
       return response.data;
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de la facture:', error);
-      throw error.response?.data || error.message;
+    } catch (error) {      throw error.response?.data || error.message;
     }
-  },
+  },deleteBill: async (billId) => {
+    if (!billId) {
+      throw new Error('ID de facture manquant');
+    }
 
-  deleteBill: async (billId) => {
     try {
       const response = await api.delete(`/bills/${billId}`);
+      if (!response.data) {
+        throw new Error('Réponse invalide du serveur');
+      }
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la suppression de la facture:', error);
-      throw error.response?.data || error.message;
+      throw error.response?.data || error;
     }
   },
 
   deleteManyBills: async (billIds) => {
+    if (!Array.isArray(billIds) || billIds.length === 0) {
+      throw new Error('La liste des IDs de factures est invalide');
+    }
+
+    // Vérifier que tous les IDs sont valides
+    if (billIds.some(id => !id)) {
+      throw new Error('Certains IDs de factures sont invalides');
+    }
+
     try {
       const response = await api.delete('/bills/many', {
         data: {
           ids: billIds
         }
       });
-      return response.data;
+
+      // Vérifier que la suppression a réussi
+      if (response.status !== 200) {
+        throw new Error(`La suppression multiple a échoué avec le statut ${response.status}`);
+      }
+
+      return {
+        ...response.data,
+        success: true,
+        deletedCount: billIds.length
+      };
     } catch (error) {
       console.error('Erreur lors de la suppression multiple des factures:', error);
-      throw error.response?.data || error.message;
+      throw {
+        message: error.response?.data?.message || error.message,
+        status: error.response?.status,
+        billIds
+      };
     }
   }
 };

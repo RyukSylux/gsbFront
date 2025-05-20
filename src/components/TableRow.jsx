@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { authAPI } from '../services/api';
 import ConfirmModal from './ConfirmModal';
 
@@ -45,10 +45,24 @@ const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, o
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const [billIdToDelete, setBillIdToDelete] = useState(null);
+
+  const cleanupDeleteState = useCallback(() => {
+    setIsDeleting(false);
+    setShowDeleteConfirm(false);
+    setDeleteError(null);
+  }, []);
+
+  // Nettoyer l'état si le composant est démonté pendant la suppression
+  useEffect(() => {
+    return () => {
+      cleanupDeleteState();
+    };
+  }, [cleanupDeleteState]);
+
   const handleClick = (e) => {
-    // N'ouvrir la modale que si on ne clique pas sur un bouton ou une checkbox
     if (!e.target.closest('button') && !e.target.closest('input[type="checkbox"]')) {
-      console.log('Clic sur la ligne de facture:', customer);
       if (onBillClick) {
         onBillClick(customer);
       }
@@ -62,26 +76,33 @@ const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, o
     }
   };
 
-  const handleDelete = (e) => {
-    e.stopPropagation();
+  const handleDelete = async (e) => {    e.stopPropagation();
+    e.preventDefault();
     setShowDeleteConfirm(true);
   };
 
   const confirmDelete = async () => {
+    // Important: Récupérer l'ID directement de customer._id au moment de la suppression
+    const idToDelete = customer?._id;    if (!idToDelete) {
+      setDeleteError('ID de facture manquant');
+      setShowErrorModal(true);
+      return;
+    }
+
     try {
       setIsDeleting(true);
-      await authAPI.deleteBill(customer._id);
+      await authAPI.deleteBill(idToDelete);
+      setShowDeleteConfirm(false);
       if (onBillDeleted) {
         onBillDeleted();
       }
-    } catch (error) {
-      console.error('Erreur lors de la suppression:', error);
+    } catch (error) {      setDeleteError(error.message || 'Erreur lors de la suppression');
       setShowErrorModal(true);
     } finally {
       setIsDeleting(false);
-      setShowDeleteConfirm(false);
     }
   };
+
   return (
     <>
       <tr className="hover:bg-gray-50">
@@ -169,8 +190,8 @@ const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, o
         <ConfirmModal
           isOpen={showDeleteConfirm}
           title="Supprimer la facture"
-          message="Êtes-vous sûr de vouloir supprimer cette facture ?"
-          confirmText="Supprimer"
+          message={`Êtes-vous sûr de vouloir supprimer la facture : ${customer.description} ?`}
+          confirmText={isDeleting ? "Suppression..." : "Supprimer"}
           cancelText="Annuler"
           onConfirm={confirmDelete}
           onCancel={() => setShowDeleteConfirm(false)}

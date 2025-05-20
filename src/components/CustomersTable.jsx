@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TableHeader from './TableHeader';
 import TableRow from './TableRow';
 import TableControls from './TableControls';
@@ -13,13 +13,33 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
   const {
     currentItems: currentCustomers,
     currentPage,
+    setCurrentPage,
     maxPage,
     paginate,
     nextPage,
     prevPage,
-    getPageNumbers,
-    totalItems
-  } = usePagination(customers, 5); // 5 éléments par page pour plus de pagination
+    getPageNumbers
+  } = usePagination(customers, 5);
+
+  // Réinitialiser la sélection quand les factures changent
+  useEffect(() => {
+    setSelectedBills([]);
+  }, [customers]);
+
+  const handleBillDeleted = () => {
+    // Si c'est la dernière facture de la page et qu'on n'est pas sur la première page
+    if (currentCustomers.length === 1 && currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+    
+    // Désélectionner toutes les factures
+    setSelectedBills([]);
+    
+    // Notifier le parent pour recharger les données
+    if (onBillsDeleted) {
+      onBillsDeleted();
+    }
+  };
 
   const handleSelectBill = (billId, isSelected) => {
     setSelectedBills(prev => 
@@ -39,22 +59,27 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer ${selectedBills.length} facture(s) ?`)) {
       try {
         setIsDeleting(true);
-        await authAPI.deleteManyBills(selectedBills);
+        const result = await authAPI.deleteManyBills(selectedBills);
+        
+        // Vérifier le résultat de la suppression multiple
+        if (!result || !result.success) {
+          throw new Error('La suppression multiple a échoué');
+        }
+        
         setSelectedBills([]);
         if (onBillsDeleted) {
-          onBillsDeleted();
+          // Forcer un petit délai pour s'assurer que le backend a bien fini le traitement
+          setTimeout(() => {
+            onBillsDeleted();
+          }, 100);
         }
-      } catch (error) {
-        console.error('Erreur lors de la suppression des factures:', error);
-        alert('Une erreur est survenue lors de la suppression des factures');
+      } catch (error) {        alert(error.message || 'Une erreur est survenue lors de la suppression des factures');
       } finally {
         setIsDeleting(false);
       }
     }
   };
-
   const handleRowClick = (bill) => {
-    console.log('CustomersTable: Clic sur la facture', bill);
     if (onBillClick) {
       onBillClick(bill);
     }
@@ -130,29 +155,32 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
                   isAllSelected={selectedBills.length > 0 && selectedBills.length === currentCustomers.length}
                 />
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {currentCustomers.map((bill) => (
-                    <TableRow
-                      key={bill._id}
-                      customer={bill}
-                      showUserInfo={isAdmin}
-                      onBillClick={handleRowClick}
-                      isSelected={selectedBills.includes(bill._id)}
-                      onSelect={(isSelected) => handleSelectBill(bill._id, isSelected)}
-                      onBillDeleted={onBillsDeleted}
-                    />
-                  ))}
+                  {currentCustomers.map((bill, index) => {
+                    // Calculer l'index global de la facture
+                    const globalIndex = (currentPage - 1) * 5 + index; // 5 est itemsPerPage
+                    return (
+                      <TableRow
+                        key={bill._id}
+                        customer={bill}
+                        globalIndex={globalIndex}
+                        showUserInfo={isAdmin}
+                        onBillClick={handleRowClick}
+                        isSelected={selectedBills.includes(bill._id)}
+                        onSelect={(isSelected) => handleSelectBill(bill._id, isSelected)}
+                        onBillDeleted={handleBillDeleted}
+                      />
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           </div>
-        </div>
-
-        <Pagination
+        </div>        <Pagination
           currentPage={currentPage}
           maxPage={Math.max(1, maxPage)}
           onPageChange={paginate}
-          onPrevPage={prevPage}
           onNextPage={nextPage}
+          onPrevPage={prevPage}
           totalItems={customers.length}
         />
       </div>
