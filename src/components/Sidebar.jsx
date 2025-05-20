@@ -12,32 +12,31 @@ const Sidebar = ({ isOpen, onClose }) => {
           onClick={onClose}
         ></div>
       )}
-
       <aside className={`
-        fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 p-6 flex flex-col
+        w-64 bg-white border-r border-gray-200 p-6 flex flex-col
         transform transition-transform duration-200 ease-in-out
-        lg:relative lg:translate-x-0
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        fixed lg:static inset-y-0 left-0 z-30
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        <button
-          className="absolute top-4 right-4 lg:hidden"
-          onClick={onClose}
-        >
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-        
-        <div className="flex items-center mb-8">
-          <img 
-            src="/logoGSB.png" 
-            alt="GSB Logo" 
-            className="h-12 w-auto mr-2"
-          />
-          <span className="text-xl font-semibold text-[#2B84C3]">GSB</span>
+        <div className="lg:mb-6">
+          <div className="flex items-center justify-between mb-6 sticky top-0 lg:relative bg-white z-10">
+            <img
+              src="/logoGSB.png"
+              alt="Galaxy Swiss Bourdin"
+              className="h-8 lg:hidden"
+            />
+            <button
+              className="lg:hidden"
+              onClick={onClose}
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <SearchBar />
         </div>
         
-        <SearchBar />
         <Navigation />
         <Settings />
       </aside>

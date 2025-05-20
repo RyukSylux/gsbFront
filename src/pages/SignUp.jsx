@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Footer from '../components/Footer';
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -59,106 +60,120 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 py-8">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-        <div className="text-center mb-8">
-          <img 
-            src="/logoGSB.png" 
-            alt="GSB Logo" 
-            className="h-16 w-auto mx-auto mb-4"
-          />
-          <h1 className="text-2xl font-bold text-[#2B84C3]">Inscription GSB</h1>
-          <p className="text-gray-600">Créez votre compte pour commencer</p>
-        </div>
-
-        {(formError || error) && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-            {formError || error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block font-medium text-gray-700 mb-2">Nom complet</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Entrez votre nom complet"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block font-medium text-gray-700 mb-2">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Entrez votre email professionnel"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block font-medium text-gray-700 mb-2">Description</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Décrivez brièvement votre rôle"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 h-24"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block font-medium text-gray-700 mb-2">Mot de passe</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Créez un mot de passe"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              required
-            />
-            <small className="text-gray-500 mt-1 block">Doit contenir au moins 8 caractères.</small>
-          </div>
-
-          <div className="mb-6">
-            <label className="block font-medium text-gray-700 mb-2">Confirmez le mot de passe</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirmez votre mot de passe"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2 px-4 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="flex-grow flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="absolute top-4 left-4">
+          <Link
+            to="/"
+            className="inline-flex items-center px-4 py-2 text-gray-700 hover:text-[#2B84C3] transition-colors"
           >
-            {loading ? 'Inscription en cours...' : 'Créer un compte'}
-          </button>
-        </form>
-
-        <p className="mt-4 text-center text-gray-600">
-          Vous avez déjà un compte ?{" "}
-          <Link to="/signin" className="text-indigo-600 hover:text-indigo-500 hover:underline">
-            Connectez-vous
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Retour à l'accueil
           </Link>
-        </p>
+        </div>
+        <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+          <div className="text-center mb-8">
+            <img 
+              src="/logoGSB.png" 
+              alt="GSB Logo" 
+              className="h-16 w-auto mx-auto mb-4"
+            />
+            <h1 className="text-2xl font-bold text-[#2B84C3]">Inscription GSB</h1>
+            <p className="text-gray-600">Créez votre compte pour commencer</p>
+          </div>
+
+          {(formError || error) && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+              {formError || error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label className="block font-medium text-gray-700 mb-2">Nom complet</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Entrez votre nom complet"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                required
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block font-medium text-gray-700 mb-2">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Entrez votre email professionnel"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                required
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block font-medium text-gray-700 mb-2">Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Décrivez brièvement votre rôle"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 h-24"
+                required
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block font-medium text-gray-700 mb-2">Mot de passe</label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Créez un mot de passe"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                required
+              />
+              <small className="text-gray-500 mt-1 block">Doit contenir au moins 8 caractères.</small>
+            </div>
+
+            <div className="mb-6">
+              <label className="block font-medium text-gray-700 mb-2">Confirmez le mot de passe</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirmez votre mot de passe"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2 px-4 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Inscription en cours...' : 'Créer un compte'}
+            </button>
+          </form>
+
+          <p className="mt-4 text-center text-gray-600">
+            Vous avez déjà un compte ?{" "}
+            <Link to="/signin" className="text-indigo-600 hover:text-indigo-500 hover:underline">
+              Connectez-vous
+            </Link>
+          </p>
+        </div>
       </div>
+      <Footer />
     </div>
   );
 };

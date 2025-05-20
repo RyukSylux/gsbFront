@@ -5,6 +5,7 @@ import CustomersTable from '../components/CustomersTable';
 import UsersTable from '../components/UsersTable';
 import BillModal from '../components/BillModal';
 import NewBillModal from '../components/NewBillModal';
+import Footer from '../components/Footer';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
 
@@ -78,6 +79,7 @@ const Dashboard = () => {
   };
 
   const handleBillClick = (bill) => {
+    console.log('Ouverture de la facture:', bill);
     setSelectedBill(bill);
     setIsModalOpen(true);
   };
@@ -87,13 +89,15 @@ const Dashboard = () => {
     setIsModalOpen(false);
   };
 
-  const handleBillSaved = () => {
-    fetchBills();
-    handleModalClose();
+  const handleNewBill = () => {
+    console.log('Ouverture de la modale de nouvelle facture');
+    setIsNewBillModalOpen(true);
   };
 
-  const handleNewBill = () => {
-    setIsNewBillModalOpen(true);
+  const handleBillSaved = () => {
+    console.log('Facture sauvegardée, rafraîchissement des données');
+    fetchBills();
+    handleModalClose();
   };
 
   const handleNewBillModalClose = () => {
@@ -106,77 +110,76 @@ const Dashboard = () => {
   };
 
   const handleBillsDeleted = () => {
+    console.log('Factures supprimées, rafraîchissement des données');
     fetchBills();
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       
-      <main className="flex-1 overflow-auto">
-        <div className="p-4 sm:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto">
-            <Header 
-              onMenuClick={() => setSidebarOpen(true)} 
-              pageTitle={isAdmin ? "Tableau de bord administrateur" : "Mes factures"}
-              userName={user?.name}
-            />
+      <div className="flex-1 flex overflow-hidden">
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        
+        <div className="flex-1 overflow-x-auto">
+          <main className="py-6 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto space-y-8">
+              {/* Section Gestion des Utilisateurs pour Admin */}
+              {isAdmin && (
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                  <div className="p-6 border-b border-gray-200">
+                    <h2 className="text-xl font-semibold text-gray-900">Gestion des Utilisateurs</h2>
+                  </div>
+                  <UsersTable 
+                    users={users}
+                    loading={loading}
+                    error={error}
+                    onUsersListChanged={handleUsersListChanged}
+                  />
+                </div>
+              )}
 
-            {isAdmin && (
-              <>
-                <div className="mb-8">
-                  <h2 className="text-lg font-medium mb-4">Liste des utilisateurs</h2>
-                  {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-                      {error}
-                    </div>
-                  )}
-                  {loading ? (
-                    <div className="text-center py-4">Chargement des utilisateurs...</div>
-                  ) : (
-                    <UsersTable users={users} onUsersListChanged={handleUsersListChanged} />
-                  )}
+              {/* Section Gestion des Factures */}
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div className="p-6 border-b border-gray-200">
+                  <h2 className="text-xl font-semibold text-gray-900">Gestion des Factures</h2>
+                </div>                <div className="p-4">
+                  <CustomersTable 
+                    customers={customers}
+                    isAdmin={isAdmin}
+                    onBillClick={handleBillClick}
+                    onNewBill={handleNewBill}
+                    onBillsDeleted={handleBillsDeleted}
+                    loading={billsLoading}
+                    error={billsError}
+                  />
                 </div>
-                
-                <div className="mb-4">
-                  <h2 className="text-lg font-medium">Toutes les factures</h2>
-                </div>
-              </>
-            )}
-            
-            {billsError && (
-              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-                {billsError}
-              </div>
-            )}
-            
-            {billsLoading ? (
-              <div className="text-center py-4">Chargement des factures...</div>
-            ) : (
-              <CustomersTable 
-                customers={customers} 
-                isAdmin={isAdmin} 
-                onBillClick={handleBillClick}
-                onNewBill={handleNewBill}
-                onBillsDeleted={handleBillsDeleted}
-              />
-            )}
-          </div>
+              </div>              {/* Modales */}
+              {isModalOpen && selectedBill && (
+                <BillModal
+                  isOpen={isModalOpen}
+                  initialData={selectedBill}
+                  onClose={handleModalClose}
+                  onSave={handleBillSaved}
+                />
+              )}
+
+              {isNewBillModalOpen && (
+                <NewBillModal
+                  isOpen={isNewBillModalOpen}
+                  onClose={() => setIsNewBillModalOpen(false)}
+                  onSave={() => {
+                    fetchBills();
+                    setIsNewBillModalOpen(false);
+                  }}
+                />
+              )}
+            </div>
+          </main>
         </div>
-      </main>
-
-      <BillModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        onSave={handleBillSaved}
-        initialData={selectedBill}
-      />
-
-      <NewBillModal
-        isOpen={isNewBillModalOpen}
-        onClose={handleNewBillModalClose}
-        onSave={handleNewBillSaved}
-      />
+      </div>
+      
+      <Footer />
     </div>
   );
 };

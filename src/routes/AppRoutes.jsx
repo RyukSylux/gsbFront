@@ -6,6 +6,7 @@ import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
 import Dashboard from '../pages/Dashboard';
 import UserSettingsPage from '../pages/UserSettingsPage';
+import Home from '../pages/Home';
 
 // Composant de protection des routes
 const PrivateRoute = ({ children }) => {
@@ -42,7 +43,7 @@ const AppRoutes = () => {
           </PrivateRoute>
         }
       />
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<Home />} />
     </Routes>
   );
 };

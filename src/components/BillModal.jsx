@@ -14,6 +14,18 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (initialData) {
+      console.log('BillModal: Données reçues:', initialData);
+      setFormData({
+        description: initialData.description || '',
+        amount: initialData.amount || '',
+        status: initialData.status || 'pending',
+        proof: initialData.proof || null
+      });
+    }
+  }, [initialData]);
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'paid':
@@ -52,17 +64,6 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
-
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        description: initialData.description || '',
-        amount: initialData.amount || '',
-        status: initialData.status || 'pending',
-        proof: initialData.proof || null
-      });
-    }
-  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -105,7 +106,12 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    console.log('BillModal: Modal fermée');
+    return null;
+  }
+
+  console.log('BillModal: Rendu avec les données:', { isOpen, initialData, formData });
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -137,18 +143,30 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {initialData?.proof && (
+          <form onSubmit={handleSubmit} className="space-y-4">              {initialData?.proof && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Justificatif
                 </label>
                 <div className="relative h-48 w-full overflow-hidden rounded-lg border border-gray-300">
-                  <img
-                    src={initialData.proof}
-                    alt="Justificatif de la facture"
-                    className="h-full w-full object-contain"
-                  />
+                  {initialData.proof.endsWith('.pdf') ? (
+                    <div className="flex items-center justify-center h-full bg-gray-50">
+                      <a
+                        href={initialData.proof}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-indigo-600 hover:text-indigo-800"
+                      >
+                        Ouvrir le PDF
+                      </a>
+                    </div>
+                  ) : (
+                    <img
+                      src={initialData.proof}
+                      alt="Justificatif de la facture"
+                      className="h-full w-full object-contain"
+                    />
+                  )}
                   <a
                     href={initialData.proof}
                     target="_blank"
@@ -324,4 +342,4 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
   );
 };
 
-export default BillModal; 
+export default BillModal;
