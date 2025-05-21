@@ -5,10 +5,12 @@ import TableControls from './TableControls';
 import Pagination from './Pagination';
 import { usePagination } from '../hooks/usePagination';
 import { authAPI } from '../services/api';
+import { useNotification } from '../contexts/NotificationContext';
 
 const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBillsDeleted, loading, error }) => {
   const [selectedBills, setSelectedBills] = useState([]);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { showNotification } = useNotification();
 
   const {
     currentItems: currentCustomers,
@@ -66,6 +68,7 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
           throw new Error('La suppression multiple a échoué');
         }
         
+        showNotification(`${selectedBills.length} facture(s) supprimée(s) avec succès`, 'success');
         setSelectedBills([]);
         if (onBillsDeleted) {
           // Forcer un petit délai pour s'assurer que le backend a bien fini le traitement
@@ -73,7 +76,8 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
             onBillsDeleted();
           }, 100);
         }
-      } catch (error) {        alert(error.message || 'Une erreur est survenue lors de la suppression des factures');
+      } catch (error) {
+        showNotification(error.message || 'Une erreur est survenue lors de la suppression des factures', 'error');
       } finally {
         setIsDeleting(false);
       }

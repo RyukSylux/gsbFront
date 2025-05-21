@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { authAPI } from '../services/api';
+import { useNotification } from '../contexts/NotificationContext';
 
 const NewBillModal = ({ isOpen, onClose, onSave }) => {
+  const { showNotification } = useNotification();
   const [formData, setFormData] = useState({
     description: '',
     amount: '',
@@ -57,10 +59,12 @@ const NewBillModal = ({ isOpen, onClose, onSave }) => {
         amount: '',
         proof: null
       });
+      showNotification('Facture créée avec succès', 'success');
       if (onSave) onSave();
     } catch (err) {
       console.error('Erreur lors de la création de la facture:', err);
       setError(err.message || 'Une erreur est survenue lors de la création de la facture');
+      showNotification(err.message || 'Erreur lors de la création de la facture', 'error');
     } finally {
       setLoading(false);
     }
@@ -166,4 +170,4 @@ const NewBillModal = ({ isOpen, onClose, onSave }) => {
   );
 };
 
-export default NewBillModal; 
+export default NewBillModal;

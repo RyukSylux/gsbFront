@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotification } from '../contexts/NotificationContext';
 
 const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
   const { isAdmin } = useAuth();
+  const { showNotification } = useNotification();
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -31,15 +33,18 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
     if (formData.newPassword) {
       if (formData.newPassword.length < 8) {
         setError('Le nouveau mot de passe doit contenir au moins 8 caractères');
+        showNotification('Le mot de passe doit contenir au moins 8 caractères', 'error');
         return;
       }
       if (formData.newPassword !== formData.confirmNewPassword) {
         setError('Les mots de passe ne correspondent pas');
+        showNotification('Les mots de passe ne correspondent pas', 'error');
         return;
       }
       // Vérifier le mot de passe actuel seulement si non admin
       if (!isAdmin && !formData.currentPassword) {
         setError('Le mot de passe actuel est requis pour changer le mot de passe');
+        showNotification('Le mot de passe actuel est requis', 'error');
         return;
       }
     }
@@ -63,6 +68,7 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
       
       // Appeler onSave et attendre le résultat
       await onSave(updateData);
+      showNotification('Utilisateur mis à jour avec succès', 'success');
       
       // Réinitialiser le formulaire et fermer le modal
       setFormData({
@@ -77,6 +83,7 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
       onClose();
     } catch (err) {
       setError(err.message);
+      showNotification(err.message, 'error');
     }
   };
 
@@ -157,6 +164,7 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
                 >
                   <option value="user">Utilisateur</option>
                   <option value="admin">Administrateur</option>
+                  <option value="commercial">Commercial </option>
                 </select>
               </div>
 

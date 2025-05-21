@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
+import { useNotification } from '../contexts/NotificationContext';
 
 const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
   const { isAdmin } = useAuth();
+  const { showNotification } = useNotification();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     description: '',
@@ -104,16 +106,29 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
       await authAPI.updateBill(initialData._id, billData);
       setIsEditing(false);
       setSuccess('Facture mise à jour avec succès');
+      showNotification('Facture mise à jour avec succès', 'success');
       if (onSave) {
         onSave();
       }
     } catch (err) {
       console.error('Erreur lors de la mise à jour de la facture:', err);
       setError(err.response?.data?.message || err.message || 'Une erreur est survenue lors de la mise à jour');
+      showNotification(err.response?.data?.message || err.message || 'Une erreur est survenue lors de la mise à jour', 'error');
     } finally {
       setLoading(false);
     }
   };
+
+  const handleDelete = async () => {
+    try {
+      await authAPI.deleteBill(initialData._id);
+      showNotification('Facture supprimée avec succès', 'success');
+      onClose();
+    } catch (error) {
+      showNotification(error.message || 'Erreur lors de la suppression de la facture', 'error');
+    }
+  };
+
   if (!isOpen) return null;
 
   return (

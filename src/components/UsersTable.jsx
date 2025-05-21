@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotification } from '../contexts/NotificationContext';
 import EditUserModal from './EditUserModal';
 import ConfirmModal from './ConfirmModal';
 import { usePagination } from '../hooks/usePagination';
@@ -7,6 +8,7 @@ import Pagination from './Pagination';
 
 const UsersTable = ({ users, onUsersListChanged }) => {
   const { deleteUser, updateUser } = useAuth();
+  const { showNotification } = useNotification();
   const [deletingUser, setDeletingUser] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -23,13 +25,25 @@ const UsersTable = ({ users, onUsersListChanged }) => {
     prevPage,
     totalItems,
   } = usePagination(users, 5);
-
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
     });
+  };
+
+  const formatRole = (role) => {
+    switch (role) {
+      case 'admin':
+        return 'Administrateur';
+      case 'user':
+        return 'Utilisateur';
+      case 'commercial':
+        return 'Commercial';
+      default:
+        return role;
+    }
   };
 
   const handleDelete = (user) => {
@@ -44,7 +58,10 @@ const UsersTable = ({ users, onUsersListChanged }) => {
       if (onUsersListChanged) {
         onUsersListChanged({ type: 'delete', user: userToDelete });
       }
-    } catch (error) {      setErrorMessage(error.message || 'Une erreur est survenue lors de la suppression');
+      showNotification('Utilisateur supprimé avec succès', 'success');
+    } catch (error) {
+      setErrorMessage(error.message || 'Une erreur est survenue lors de la suppression');
+      showNotification(error.message || 'Une erreur est survenue lors de la suppression', 'error');
       setShowErrorModal(true);
     } finally {
       setDeletingUser(null);
@@ -104,11 +121,16 @@ const UsersTable = ({ users, onUsersListChanged }) => {
                         <div className="font-medium">{user.name}</div>
                       </div>
                     </td>
-                    <td className="py-4 px-4 text-gray-600">{user.email}</td>
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-4 text-gray-600">{user.email}</td>                    
+                    <td className="py-4 px-4">                      
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                        ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
-                        {user.role}
+                        ${user.role === 'admin' 
+                          ? 'bg-purple-100 text-purple-800' 
+                          : user.role === 'commercial' 
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-blue-100 text-blue-800'
+                        }`}>
+                        {formatRole(user.role)}
                       </span>
                     </td>
                     <td className="py-4 px-4 text-gray-600">

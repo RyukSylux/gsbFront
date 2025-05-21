@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { authAPI } from '../services/api';
+import { useNotification } from '../contexts/NotificationContext';
 import ConfirmModal from './ConfirmModal';
 
 const getStatusColor = (status) => {
@@ -42,6 +43,7 @@ const formatDate = (dateString) => {
 };
 
 const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, onBillDeleted }) => {
+  const { showNotification } = useNotification();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -85,6 +87,7 @@ const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, o
     // Important: Récupérer l'ID directement de customer._id au moment de la suppression
     const idToDelete = customer?._id;    if (!idToDelete) {
       setDeleteError('ID de facture manquant');
+      showNotification('ID de facture manquant', 'error');
       setShowErrorModal(true);
       return;
     }
@@ -92,11 +95,13 @@ const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, o
     try {
       setIsDeleting(true);
       await authAPI.deleteBill(idToDelete);
+      showNotification('Facture supprimée avec succès', 'success');
       setShowDeleteConfirm(false);
       if (onBillDeleted) {
         onBillDeleted();
       }
     } catch (error) {      setDeleteError(error.message || 'Erreur lors de la suppression');
+      showNotification(error.message || 'Erreur lors de la suppression', 'error');
       setShowErrorModal(true);
     } finally {
       setIsDeleting(false);
@@ -123,11 +128,11 @@ const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, o
                     {customer.name ? customer.name.charAt(0).toUpperCase() : '?'}
                   </span>
                 </div>
-                <div className="text-sm font-medium text-gray-900 truncate">{customer.name}</div>
+                <div className="text-sm font-medium text-gray-900 truncate">{customer.name ? customer.name : 'Utilisateur supprimé'}</div>
               </div>
             </td>
             <td className="w-56 px-6 py-4 whitespace-nowrap">
-              <div className="text-sm text-gray-500 truncate">{customer.email}</div>
+              <div className="text-sm text-gray-500 truncate">{customer.email ? customer.email : 'Utilisateur supprimé'}</div>
             </td>
           </>
         )}
