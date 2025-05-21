@@ -8,6 +8,7 @@ import NewBillModal from '../components/NewBillModal';
 import Footer from '../components/Footer';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
+import { TableLoadingScreen, NoDataScreen } from '../components/LoadingScreen';
 
 const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -17,20 +18,26 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [billsError, setBillsError] = useState(null);
-  const [billsLoading, setBillsLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [billsLoading, setBillsLoading] = useState(false);  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewBillModalOpen, setIsNewBillModalOpen] = useState(false);
   const [selectedBill, setSelectedBill] = useState(null);
-
+  const [isServerAwake, setIsServerAwake] = useState(true);
   // Charger la liste des utilisateurs si admin
   useEffect(() => {
-    const fetchUsers = async () => {      if (isAdmin) {
+    const fetchUsers = async () => {
+      if (isAdmin) {
         setLoading(true);
         try {
           const usersData = await authAPI.getAllUsers();
           setUsers(usersData);
+          setError(null);
         } catch (err) {
-          setError('Impossible de charger la liste des utilisateurs');
+          if (err.message?.includes('Network') || err.message?.includes('Failed to fetch')) {
+            setError('Le serveur est en cours de réveil. Veuillez patienter quelques secondes...');
+            setIsServerAwake(false);
+          } else {
+            setError('Impossible de charger la liste des utilisateurs');
+          }
         } finally {
           setLoading(false);
         }
@@ -39,23 +46,53 @@ const Dashboard = () => {
 
     fetchUsers();
   }, [isAdmin]);
-
   // Optimiser fetchBills avec useCallback pour éviter les re-rendus inutiles
   const fetchBills = useCallback(async () => {
-    try {      setLoading(true);
-      setError(null);
+    try {
+      setBillsLoading(true);
+      setBillsError(null);
       const bills = await authAPI.getBills();
       setCustomers(bills);
+      setIsServerAwake(true);
     } catch (err) {
-      setError('Erreur lors du chargement des factures');
+      if (err.message?.includes('Network') || err.message?.includes('Failed to fetch')) {
+        setBillsError('Le serveur est en cours de réveil. Veuillez patienter quelques secondes...');
+        setIsServerAwake(false);
+      } else {
+        setBillsError('Erreur lors du chargement des factures');
+      }
     } finally {
-      setLoading(false);
+      setBillsLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchBills();
   }, [fetchBills]);
+
+  // Effet pour recharger les données si le serveur était endormi
+  useEffect(() => {
+    if (!isServerAwake) {
+      const retryTimeout = setTimeout(() => {
+        fetchBills();
+        if (isAdmin) {
+          const fetchUsers = async () => {
+            try {
+              const usersData = await authAPI.getAllUsers();
+              setUsers(usersData);
+              setError(null);
+              setIsServerAwake(true);
+            } catch (err) {
+              // Ne pas mettre à jour l'erreur ici pour éviter les messages en boucle
+            }
+          };
+          fetchUsers();
+        }
+      }, 5000); // Réessayer après 5 secondes
+
+      return () => clearTimeout(retryTimeout);
+    }
+  }, [isServerAwake, isAdmin, fetchBills]);
 
   const handleUsersListChanged = (change) => {
     if (change.type === 'delete') {
@@ -111,16 +148,27 @@ const Dashboard = () => {
             <div className="max-w-7xl mx-auto space-y-8">
               {/* Section Gestion des Utilisateurs pour Admin */}
               {isAdmin && (
-                <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                  <div className="p-6 border-b border-gray-200">
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden">                  <div className="p-6 border-b border-gray-200">
                     <h2 className="text-xl font-semibold text-gray-900">Gestion des Utilisateurs</h2>
                   </div>
-                  <UsersTable 
-                    users={users}
-                    loading={loading}
-                    error={error}
-                    onUsersListChanged={handleUsersListChanged}
-                  />
+                  {loading ? (
+                    <div className="p-6">
+                      <TableLoadingScreen />
+                    </div>
+                  ) : error ? (
+                    <div className="p-6 text-center">
+                      <div className="text-red-600 mb-4">{error}</div>
+                    </div>
+                  ) : users.length === 0 ? (
+                    <div className="p-6">
+                      <NoDataScreen message="Aucun utilisateur trouvé" />
+                    </div>
+                  ) : (
+                    <UsersTable 
+                      users={users}
+                      onUsersListChanged={handleUsersListChanged}
+                    />
+                  )}
                 </div>
               )}
 

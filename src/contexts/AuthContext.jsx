@@ -8,19 +8,42 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
-
   // Vérifier le token au chargement
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // Récupérer les informations utilisateur du token
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
+        // Vérifier si le token est expiré
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          const expirationDate = new Date(payload.exp * 1000);
+          
+          if (expirationDate <= new Date()) {
+            console.log('Token expiré');
+            localStorage.removeItem('token');
+            setLoading(false);
+            return;
+          }
+        } catch (err) {
+          console.error('Erreur lors de la vérification du token:', err);
+          localStorage.removeItem('token');
+          setLoading(false);
+          return;
+        }
+
+        // Token valide, récupérer les informations utilisateur
         const userData = await authAPI.getCurrentUser();
-        console.log('Initial user data:', userData);
         setUser(userData);
         setIsAdmin(userData.role === 'admin');
       } catch (err) {
         console.error('Auth init error:', err);
         localStorage.removeItem('token');
+        window.location.href = '/signin';
       } finally {
         setLoading(false);
       }

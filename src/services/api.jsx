@@ -18,6 +18,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Intercepteur pour gérer les erreurs d'authentification
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expiré ou invalide
+      localStorage.removeItem('token');
+      window.location.href = '/signin';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const authAPI = {
   login: async (email, password) => {
     try {      const response = await api.post('/login', { email, password });
