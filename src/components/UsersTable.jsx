@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import EditUserModal from './EditUserModal';
 import ConfirmModal from './ConfirmModal';
+import { usePagination } from '../hooks/usePagination';
+import Pagination from './Pagination';
 
 const UsersTable = ({ users, onUsersListChanged }) => {
   const { deleteUser, updateUser } = useAuth();
@@ -11,6 +13,16 @@ const UsersTable = ({ users, onUsersListChanged }) => {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [userToDelete, setUserToDelete] = useState(null);
+
+  const {
+    currentItems: currentUsers,
+    currentPage,
+    maxPage,
+    paginate,
+    nextPage,
+    prevPage,
+    totalItems,
+  } = usePagination(users, 5);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -80,7 +92,7 @@ const UsersTable = ({ users, onUsersListChanged }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {users.map((user) => (
+                {currentUsers.map((user) => (
                   <tr key={user._id} className="text-sm hover:bg-gray-50">
                     <td className="py-4 px-4">
                       <div className="flex items-center">
@@ -172,6 +184,18 @@ const UsersTable = ({ users, onUsersListChanged }) => {
         type="warning"
         confirmText="OK"
       />
+
+      {users.length > 0 && (
+        <Pagination 
+          currentPage={currentPage}
+          maxPage={maxPage}
+          totalItems={totalItems}
+          itemLabel="utilisateurs"
+          paginate={paginate}
+          nextPage={nextPage}
+          prevPage={prevPage}
+        />
+      )}
     </>
   );
 };

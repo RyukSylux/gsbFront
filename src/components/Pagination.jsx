@@ -1,10 +1,8 @@
 import React from 'react';
 
-const Pagination = ({ currentPage, maxPage, onPageChange, onPrevPage, onNextPage, totalItems }) => {
-  const itemsPerPage = 5;
-  const start = totalItems === 0 ? 0 : ((currentPage - 1) * itemsPerPage) + 1;
-  const end = Math.min(currentPage * itemsPerPage, totalItems);
-  const pages = Array.from({ length: maxPage }, (_, i) => i + 1);
+const Pagination = ({ currentPage, maxPage, paginate, prevPage, nextPage, totalItems, itemLabel }) => {  const pages = Array.from({ length: maxPage }, (_, i) => i + 1);
+  const start = totalItems === 0 ? 0 : ((currentPage - 1) * 5) + 1;
+  const end = Math.min(currentPage * 5, totalItems);
 
   const renderPageButtons = () => {
     const shouldShowPage = (page) => {
@@ -42,7 +40,7 @@ const Pagination = ({ currentPage, maxPage, onPageChange, onPrevPage, onNextPage
         renderedPages.push(
           <button
             key={page}
-            onClick={() => onPageChange(page)}            className={`relative inline-flex items-center justify-center w-8 h-8 text-sm font-medium transition-colors border-l-0 border-r-0 rounded-none
+            onClick={() => paginate(page)}            className={`relative inline-flex items-center justify-center w-8 h-8 text-sm font-medium transition-colors border-l-0 border-r-0 rounded-none
               ${currentPage === page
                 ? "z-10 bg-[#2B84C3] text-white hover:bg-[#2472A8] ring-1 ring-[#2B84C3]"
                 : "bg-white text-gray-700 hover:bg-gray-50 ring-1 ring-gray-300"}`}
@@ -64,13 +62,13 @@ const Pagination = ({ currentPage, maxPage, onPageChange, onPrevPage, onNextPage
             <span className="font-medium text-[#2B84C3]">{end}</span>
             {' '}sur{' '}
             <span className="font-medium text-[#2B84C3]">{totalItems}</span>
-            {' '}facture{totalItems > 1 ? 's' : ''}
+            {' '}{itemLabel}
           </p>
           <div className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded">
             Page {currentPage} sur {maxPage}
           </div>
         </div>        <nav className="isolate inline-flex items-center" aria-label="Pagination">
-          <button            onClick={onPrevPage}
+          <button            onClick={prevPage}
             disabled={currentPage === 1}
             className={`relative inline-flex items-center justify-center w-8 h-8 text-sm font-medium rounded-l border-r-0 rounded-r-none transition-colors ${
               currentPage === 1
@@ -84,7 +82,7 @@ const Pagination = ({ currentPage, maxPage, onPageChange, onPrevPage, onNextPage
             </svg>
           </button>
 
-          {renderPageButtons()}          <button            onClick={onNextPage}
+          {renderPageButtons()}          <button            onClick={nextPage}
             disabled={currentPage === maxPage}
             className={`relative inline-flex items-center justify-center w-8 h-8 text-sm font-medium rounded-r border-l-0 rounded-l-none transition-colors ${
               currentPage === maxPage

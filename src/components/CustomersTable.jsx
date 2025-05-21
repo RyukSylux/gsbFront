@@ -175,13 +175,15 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
               </table>
             </div>
           </div>
-        </div>        <Pagination
+        </div>        
+        <Pagination
           currentPage={currentPage}
           maxPage={Math.max(1, maxPage)}
-          onPageChange={paginate}
-          onNextPage={nextPage}
-          onPrevPage={prevPage}
+          paginate={paginate}
+          nextPage={nextPage}
+          prevPage={prevPage}
           totalItems={customers.length}
+          itemLabel="factures"
         />
       </div>
     </div>
