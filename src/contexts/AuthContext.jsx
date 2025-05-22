@@ -5,45 +5,22 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  // Vérifier le token au chargement
+
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          setLoading(false);
-          return;
-        }
-
-        // Vérifier si le token est expiré
-        try {
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          const expirationDate = new Date(payload.exp * 1000);
-          
-          if (expirationDate <= new Date()) {
-            console.log('Token expiré');
-            localStorage.removeItem('token');
-            setLoading(false);
-            return;
-          }
-        } catch (err) {
-          console.error('Erreur lors de la vérification du token:', err);
-          localStorage.removeItem('token');
-          setLoading(false);
-          return;
-        }
-
-        // Token valide, récupérer les informations utilisateur
         const userData = await authAPI.getCurrentUser();
-        setUser(userData);
-        setIsAdmin(userData.role === 'admin');
+        if (userData) {
+          setUser(userData);
+          setIsAdmin(userData.role === 'admin');
+        }
       } catch (err) {
-        console.error('Auth init error:', err);
-        localStorage.removeItem('token');
-        window.location.href = '/signin';
+        console.error('Erreur lors de l\'initialisation de l\'auth:', err);
+        setUser(null);
+        setIsAdmin(false);
       } finally {
         setLoading(false);
       }
@@ -52,35 +29,28 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, rememberMe = false) => {
     try {
       setError(null);
-      const { token, user: userData } = await authAPI.login(email, password);
-      console.log('Login successful:', { token, userData });
-      
-      localStorage.setItem('token', token);
+      const userData = await authAPI.login(email, password, rememberMe);
       setUser(userData);
       setIsAdmin(userData.role === 'admin');
-      return userData;
     } catch (err) {
-      const errorMessage = err.message || 'Erreur lors de la connexion';
-      console.error('Login error:', errorMessage);
-      setError(errorMessage);
-      throw new Error(errorMessage);
+      setError(err.message);
+      throw err;
     }
   };
 
   const logout = () => {
+    authAPI.clearTokens(); // Utilisation de la fonction clearTokens de l'API
     setUser(null);
     setIsAdmin(false);
-    localStorage.removeItem('token');
   };
 
   const register = async (userData) => {
     try {
       const response = await authAPI.register(userData);
       setUser(response.data);
-      setIsAdmin(response.data.role === 'admin');
       setError(null);
       return response.data;
     } catch (error) {
@@ -117,13 +87,13 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     error,
-    isAdmin,
     register,
     deleteUser,
     updateUser,
     loading,
     login,
-    logout
+    logout,
+    isAdmin
   };
 
   return (

@@ -2,6 +2,54 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
+const setSecureStorage = (token, expiresIn, rememberMe) => {
+  // Toujours stocker le token dans sessionStorage pour la session courante
+  sessionStorage.setItem('token', token);
+  
+  if (rememberMe) {
+    localStorage.setItem('refreshToken', token);
+    const expirationDate = new Date(Date.now() + expiresIn * 1000).getTime();
+    const encodedExpiration = btoa(expirationDate.toString());
+    localStorage.setItem('tokenExp', encodedExpiration);
+    localStorage.setItem('rememberMe', 'true');
+  }
+};
+
+const clearTokens = () => {
+  sessionStorage.removeItem('token');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('tokenExp');
+  localStorage.removeItem('rememberMe');
+};
+
+const getValidToken = () => {
+  // D'abord essayer le token de session
+  let token = sessionStorage.getItem('token');
+  
+  // Si pas de token de session, vérifier le refresh token
+  if (!token) {
+    const refreshToken = localStorage.getItem('refreshToken');
+    const encodedExp = localStorage.getItem('tokenExp');
+    
+    if (refreshToken && encodedExp) {
+      try {
+        const expiration = parseInt(atob(encodedExp));
+        if (Date.now() < expiration) {
+          token = refreshToken;
+          // Restaurer le token dans la session
+          sessionStorage.setItem('token', token);
+        } else {
+          clearTokens(); // Nettoyer si expiré
+        }
+      } catch (error) {
+        clearTokens(); // Nettoyer si erreur de décodage
+      }
+    }
+  }
+  
+  return token;
+};
+
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -11,7 +59,7 @@ const api = axios.create({
 
 // Intercepteur pour ajouter le token JWT à chaque requête
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = getValidToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -23,40 +71,61 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expiré ou invalide
-      localStorage.removeItem('token');
+      clearTokens();
       window.location.href = '/signin';
     }
     return Promise.reject(error);
   }
 );
 
+const handleApiError = (error) => {
+  let errorMessage = 'Une erreur est survenue';
+
+  // Si le token est expiré, nettoyer le stockage local
+  if (error.response?.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('tokenExpiration');
+    localStorage.removeItem('rememberMe');
+  }
+
+  throw new Error(errorMessage);
+};
+
 export const authAPI = {
-  login: async (email, password) => {
-    try {      const response = await api.post('/login', { email, password });
+  clearTokens,
+  
+  login: async (email, password, rememberMe = false) => {
+    try {
+      const response = await axios.post(`${API_URL}/login`, {
+        email,
+        password,
+        rememberMe
+      });
       
-      if (response.data.token) {
-        // Décodage du token JWT (partie payload)
-        const payload = JSON.parse(atob(response.data.token.split('.')[1]));
-        
-        return {
-          token: response.data.token,
-          user: payload // Les informations utilisateur sont déjà dans le token
-        };
-      }
-      throw new Error('Token non reçu');
-    } catch (error) {      throw error.response?.data || error;
+      const { token, expiresIn, user } = response.data;
+      setSecureStorage(token, expiresIn, rememberMe);
+      return user;
+    } catch (error) {
+      throw handleApiError(error);
     }
   },
 
   getCurrentUser: async () => {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('Aucun token trouvé');    // Décodage du token JWT pour obtenir les informations utilisateur
+    const token = getValidToken();
+    if (!token) {
+      return null;
+    }
+
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload;
+      // Vérifier si le payload est valide
+      if (payload && payload.id) {
+        return payload;
+      }
+      return null;
     } catch (error) {
-      throw new Error('Token invalide');
+      clearTokens();
+      return null;
     }
   },
 

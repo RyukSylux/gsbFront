@@ -5,10 +5,11 @@ import Footer from '../components/Footer';
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const { login, error, user } = useAuth();
+  const { login, error, user } = useAuth();  
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    rememberMe: false
   });
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState('');
@@ -19,22 +20,19 @@ const SignIn = () => {
       navigate('/dashboard');
     }
   }, [user, navigate]);
-
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
-    setLoading(true);
-
-    try {
-      await login(formData.email, formData.password);
+    setLoading(true);    try {
+      await login(formData.email, formData.password, formData.rememberMe);
       // La redirection se fera automatiquement grâce au useEffect
     } catch (err) {
       console.error('Erreur de connexion:', err);
@@ -86,9 +84,8 @@ const SignIn = () => {
                 placeholder="Entrez votre email"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 required
-              />
-            </div>
-            <div className="mb-6">
+              />            </div>
+            <div className="mb-4">
               <input
                 type="password"
                 name="password"
@@ -98,6 +95,19 @@ const SignIn = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 required
               />
+            </div>
+            <div className="mb-6 flex items-center">
+              <input
+                type="checkbox"
+                name="rememberMe"
+                id="rememberMe"
+                checked={formData.rememberMe}
+                onChange={handleChange}
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
+                Se souvenir de moi
+              </label>
             </div>
             <button
               type="submit"
