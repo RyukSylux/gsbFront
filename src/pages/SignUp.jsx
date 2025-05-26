@@ -49,7 +49,7 @@ const SignUp = () => {
 
     try {
       // On retire confirmPassword avant d'envoyer au serveur
-      const { confirmPassword, ...registrationData } = formData;
+      const { ...registrationData } = formData;
       await register(registrationData);
       navigate('/dashboard');
     } catch (err) {

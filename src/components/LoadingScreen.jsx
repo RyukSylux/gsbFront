@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const TableLoadingScreen = () => {
+export const TableLoadingScreen = ({ message = "Chargement des données..."}) => {
   return (
     <div className="min-h-[400px] flex flex-col items-center justify-center p-8 bg-white rounded-lg">
       <div className="space-y-8 w-full max-w-lg">
@@ -27,7 +27,7 @@ export const TableLoadingScreen = () => {
         </div>
       </div>
       <div className="mt-4 text-center text-gray-500">
-        Chargement des données...
+        {message}
       </div>
     </div>
   );

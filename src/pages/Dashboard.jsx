@@ -12,13 +12,14 @@ import { TableLoadingScreen, NoDataScreen } from '../components/LoadingScreen';
 
 const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
   const [users, setUsers] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [billsError, setBillsError] = useState(null);
-  const [billsLoading, setBillsLoading] = useState(false);  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [billsLoading, setBillsLoading] = useState(false);  
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewBillModalOpen, setIsNewBillModalOpen] = useState(false);
   const [selectedBill, setSelectedBill] = useState(null);
   const [isServerAwake, setIsServerAwake] = useState(true);
@@ -83,7 +84,7 @@ const Dashboard = () => {
               setError(null);
               setIsServerAwake(true);
             } catch (err) {
-              // Ne pas mettre à jour l'erreur ici pour éviter les messages en boucle
+              console.error('Erreur lors du chargement des utilisateurs:', err);
             }
           };
           fetchUsers();
@@ -124,14 +125,6 @@ const Dashboard = () => {
     handleModalClose();
   };
 
-  const handleNewBillModalClose = () => {
-    setIsNewBillModalOpen(false);
-  };
-
-  const handleNewBillSaved = () => {
-    fetchBills();
-    handleNewBillModalClose();
-  };
   const handleBillsDeleted = useCallback(async () => {
     await fetchBills();
   }, [fetchBills]);
@@ -148,12 +141,13 @@ const Dashboard = () => {
             <div className="max-w-7xl mx-auto space-y-8">
               {/* Section Gestion des Utilisateurs pour Admin */}
               {isAdmin && (
-                <div className="bg-white rounded-lg shadow-lg overflow-hidden">                  <div className="p-6 border-b border-gray-200">
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden">                  
+                <div className="p-6 border-b border-gray-200">
                     <h2 className="text-xl font-semibold text-gray-900">Gestion des Utilisateurs</h2>
                   </div>
                   {loading ? (
                     <div className="p-6">
-                      <TableLoadingScreen />
+                      <TableLoadingScreen message = "Chargement des utilisateurs..."/>
                     </div>
                   ) : error ? (
                     <div className="p-6 text-center">

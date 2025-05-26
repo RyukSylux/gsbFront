@@ -6,6 +6,7 @@ import Pagination from './Pagination';
 import { usePagination } from '../hooks/usePagination';
 import { authAPI } from '../services/api';
 import { useNotification } from '../contexts/NotificationContext';
+import { TableLoadingScreen } from '../components/LoadingScreen';
 
 const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBillsDeleted, loading, error }) => {
   const [selectedBills, setSelectedBills] = useState([]);
@@ -20,7 +21,6 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
     paginate,
     nextPage,
     prevPage,
-    getPageNumbers
   } = usePagination(customers, 5);
 
   // Réinitialiser la sélection quand les factures changent
@@ -92,8 +92,7 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2B84C3] mx-auto"></div>
-        <p className="mt-4 text-gray-600">Chargement des factures...</p>
+        <TableLoadingScreen message="Chargement des factures..."/>
       </div>
     );
   }

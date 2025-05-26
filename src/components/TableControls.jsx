@@ -1,11 +1,7 @@
 import React from 'react';
 
-const TableControls = ({ selectedCount, onSelectAll, onDeleteSelected, isDeleting = false, showActions = true, onNewBill }) => {
-  const handleSelectAllChange = (e) => {
-    if (onSelectAll) {
-      onSelectAll(e.target.checked);
-    }
-  };
+const TableControls = ({ selectedCount, onDeleteSelected, isDeleting = false, showActions = true, onNewBill }) => {
+
 
   return (
     <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 border-b border-gray-200">
@@ -13,12 +9,6 @@ const TableControls = ({ selectedCount, onSelectAll, onDeleteSelected, isDeletin
       {showActions && (
         <div className="flex items-center gap-3 min-w-0 flex-wrap">
           <div className="flex items-center gap-2">
-            <input 
-              type="checkbox" 
-              onChange={handleSelectAllChange}
-              className="rounded border-gray-300 text-[#2B84C3] focus:ring-[#2B84C3]"
-            />
-            <span className="text-sm text-gray-600 whitespace-nowrap">Tout sélectionner</span>
           </div>
 
           {selectedCount > 0 && (

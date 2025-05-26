@@ -26,7 +26,8 @@ const PrivateRoute = ({ children }) => {
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/signin" element={<SignIn />} />      <Route path="/signup" element={<SignUp />} />
+      <Route path="/signin" element={<SignIn />} />      
+      <Route path="/signup" element={<SignUp />} />
       <Route
         path="/dashboard"
         element={
