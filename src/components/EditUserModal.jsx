@@ -8,7 +8,6 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    description: user?.description || '',
     role: user?.role || 'user',
     currentPassword: '',
     newPassword: '',
@@ -53,7 +52,6 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
       const updateData = {
         name: formData.name,
         email: formData.email !== user.email ? formData.email : undefined,
-        description: formData.description,
         role: formData.role
       };
 
@@ -74,7 +72,6 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
       setFormData({
         name: '',
         email: '',
-        description: '',
         role: 'user',
         currentPassword: '',
         newPassword: '',
@@ -139,17 +136,6 @@ const EditUserModal = ({ user, isOpen, onClose, onSave }) => {
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block font-medium text-gray-700 mb-2">Description</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  rows="3"
                 />
               </div>
 

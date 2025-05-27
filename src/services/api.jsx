@@ -129,7 +129,8 @@ export const authAPI = {
     }
   },
 
-  getAllUsers: async () => {    try {
+  getAllUsers: async () => {    
+    try {
       const response = await api.get('/users');
       return response.data;
     } catch (error) {
@@ -180,18 +181,17 @@ export const authAPI = {
   },
 
   deleteUser: async (email) => {
-    try {
       const response = await api.delete(`/users/${email}`);
       return response.data;
-    } catch (error) {      throw error;
-    }
   },
 
   getBills: async () => {
     try {
       const response = await api.get('/bills');
       return response.data;
-    } catch (error) {      throw error.response?.data || error.message;
+    } catch (error) 
+    {      
+      throw error.response?.data || error.message;
     }
   },
 
@@ -305,6 +305,31 @@ export const authAPI = {
         message: error.response?.data?.message || error.message,
         status: error.response?.status,
         billIds
+      };
+    }
+  },
+
+  analyzeReceipt: async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('receipt', file);
+      
+      const response = await api.post('/bills/analyze', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+      
+      return {
+        description: response.data.description || '',
+        amount: response.data.amount || '',
+      };
+    } catch (error) {
+      console.warn('Erreur lors de l\'analyse de la facture:', error);
+      // En cas d'erreur, on retourne des valeurs vides
+      return {
+        description: '',
+        amount: '',
       };
     }
   }

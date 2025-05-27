@@ -1,18 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { authAPI } from '../services/api';
+import { ocrService } from '../services/ocrService';
 import { useNotification } from '../contexts/NotificationContext';
 
 const NewBillModal = ({ isOpen, onClose, onSave }) => {
   const { showNotification } = useNotification();
-  const [formData, setFormData] = useState({
-    description: '',
-    amount: '',
-    proof: null
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const formatDate = (date) => {
     const day = String(date.getDate()).padStart(2, '0');
@@ -21,13 +15,72 @@ const NewBillModal = ({ isOpen, onClose, onSave }) => {
     return `${day}/${month}/${year}`;
   };
 
+  const [formData, setFormData] = useState({
+    description: '',
+    amount: '',
+    date: formatDate(new Date()),
+    proof: null
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+
+  // Cleanup du worker Tesseract quand le composant est démonté
+  useEffect(() => {
+    return () => {
+      ocrService.terminate();
+    };
+  }, []);
+
+  const processReceiptOCR = async (file) => {
+    // Vérifier si le fichier est une image
+    if (!file.type.startsWith('image/')) {
+      setFormData(prev => ({
+        ...prev,
+        proof: file
+      }));
+      showNotification('L\'analyse OCR ne fonctionne qu\'avec les images', 'warning');
+      return;
+    }
+
+    try {
+      setAnalyzing(true);
+      showNotification('Analyse du justificatif en cours...', 'info');
+      
+      const results = await ocrService.analyzeImage(file);
+        if (results.description || results.amount || results.date) {
+        setFormData(prev => ({
+          ...prev,
+          description: results.description || prev.description,
+          amount: results.amount || prev.amount,
+          date: results.date || prev.date,
+          proof: file
+        }));
+        showNotification('Justificatif analysé avec succès', 'success');
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          proof: file
+        }));
+        showNotification('Impossible d\'extraire les informations automatiquement', 'warning');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'analyse OCR:', error);
+      showNotification('Erreur lors de l\'analyse du justificatif', 'error');
+      setFormData(prev => ({
+        ...prev,
+        proof: file
+      }));
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'proof' && files?.length) {
-      setFormData(prev => ({
-        ...prev,
-        [name]: files[0]
-      }));
+      const file = files[0];
+      processReceiptOCR(file);
     } else {
       setFormData(prev => ({
         ...prev,
@@ -41,22 +94,21 @@ const NewBillModal = ({ isOpen, onClose, onSave }) => {
     setError('');
     setLoading(true);
 
-    try {
-      const billData = {
+    try {      const billData = {
         metadata: {
           description: formData.description,
           amount: Number(formData.amount),
-          date: formatDate(new Date()),
+          date: formData.date,
           status: 'pending',
-          type: 'expense'
+                    type: 'expense'
         },
         proof: formData.proof
       };
 
-      await authAPI.createBill(billData);
-      setFormData({
+      await authAPI.createBill(billData);      setFormData({
         description: '',
         amount: '',
+        date: formatDate(new Date()),
         proof: null
       });
       showNotification('Facture créée avec succès', 'success');
@@ -93,6 +145,26 @@ const NewBillModal = ({ isOpen, onClose, onSave }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
+                Justificatif {analyzing && <span className="text-xs text-indigo-600 ml-2">(Analyse en cours...)</span>}
+              </label>
+              <input
+                type="file"
+                name="proof"
+                onChange={handleChange}
+                className="w-full text-sm text-gray-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-md file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-indigo-50 file:text-indigo-700
+                  hover:file:bg-indigo-100"
+                accept="image/*,.pdf"
+                required
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                * Le système tentera d'extraire automatiquement les informations du justificatif
+              </p>
+            </div>            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Description
               </label>
               <input
@@ -100,6 +172,29 @@ const NewBillModal = ({ isOpen, onClose, onSave }) => {
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Date
+              </label>
+              <input
+                type="date"
+                name="date"
+                value={formData.date.split('/').reverse().join('-')} /* Convertir DD/MM/YYYY en YYYY-MM-DD pour l'input date */
+                onChange={(e) => {
+                  const date = new Date(e.target.value);
+                  const formattedDate = formatDate(date);
+                  handleChange({
+                    target: {
+                      name: 'date',
+                      value: formattedDate
+                    }
+                  });
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
               />
@@ -121,25 +216,6 @@ const NewBillModal = ({ isOpen, onClose, onSave }) => {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Justificatif
-              </label>
-              <input
-                type="file"
-                name="proof"
-                onChange={handleChange}
-                className="w-full text-sm text-gray-500
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-md file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-indigo-50 file:text-indigo-700
-                  hover:file:bg-indigo-100"
-                accept="image/*,.pdf"
-                required
-              />
-            </div>
-
             {error && (
               <div className="text-red-600 text-sm">
                 {error}
@@ -151,14 +227,14 @@ const NewBillModal = ({ isOpen, onClose, onSave }) => {
                 type="button"
                 onClick={onClose}
                 className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                disabled={loading}
+                disabled={loading || analyzing}
               >
                 Annuler
               </button>
               <button
                 type="submit"
                 className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-                disabled={loading}
+                disabled={loading || analyzing}
               >
                 {loading ? 'Création...' : 'Créer'}
               </button>

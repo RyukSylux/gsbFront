@@ -46,14 +46,10 @@ const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, o
   const { showNotification } = useNotification();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [deleteError, setDeleteError] = useState(null);
-  const [billIdToDelete, setBillIdToDelete] = useState(null);
 
   const cleanupDeleteState = useCallback(() => {
     setIsDeleting(false);
     setShowDeleteConfirm(false);
-    setDeleteError(null);
   }, []);
 
   // Nettoyer l'état si le composant est démonté pendant la suppression
@@ -62,15 +58,6 @@ const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, o
       cleanupDeleteState();
     };
   }, [cleanupDeleteState]);
-
-  const handleClick = (e) => {
-    if (!e.target.closest('button') && !e.target.closest('input[type="checkbox"]')) {
-      if (onBillClick) {
-        onBillClick(customer);
-      }
-    }
-  };
-
   const handleCheckboxChange = (e) => {
     e.stopPropagation();
     if (onSelect) {
@@ -78,17 +65,17 @@ const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, o
     }
   };
 
-  const handleDelete = async (e) => {    e.stopPropagation();
+  const handleDelete = async (e) => {
+    e.stopPropagation();
     e.preventDefault();
     setShowDeleteConfirm(true);
   };
 
   const confirmDelete = async () => {
     // Important: Récupérer l'ID directement de customer._id au moment de la suppression
-    const idToDelete = customer?._id;    if (!idToDelete) {
-      setDeleteError('ID de facture manquant');
+    const idToDelete = customer?._id;
+    if (!idToDelete) {
       showNotification('ID de facture manquant', 'error');
-      setShowErrorModal(true);
       return;
     }
 
@@ -100,9 +87,8 @@ const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, o
       if (onBillDeleted) {
         onBillDeleted();
       }
-    } catch (error) {      setDeleteError(error.message || 'Erreur lors de la suppression');
+    } catch (error) {
       showNotification(error.message || 'Erreur lors de la suppression', 'error');
-      setShowErrorModal(true);
     } finally {
       setIsDeleting(false);
     }
@@ -143,15 +129,17 @@ const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, o
           <div className="text-sm text-gray-500">{formatDate(customer.date)}</div>
         </td>
         <td className="w-32 px-6 py-4 whitespace-nowrap">
+          <div className="text-sm text-gray-500">{formatDate(customer.createdAt)}</div>
+        </td>
+        <td className="w-32 px-6 py-4 whitespace-nowrap">
           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(customer.status)}`}>
             {getStatusLabel(customer.status)}
           </span>
         </td>
         <td className="w-24 px-6 py-4 whitespace-nowrap text-sm text-gray-500">
           {customer.amount ? `${customer.amount}€` : '-'}
-        </td>
-        <td className="w-24 px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-          <div className="flex items-center justify-end space-x-3">
+        </td>        <td className="w-24 px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          <div className="flex items-center justify-end space-x-3 text-right">
             <div className="relative inline-block">
               <button
                 type="button"

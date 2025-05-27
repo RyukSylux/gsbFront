@@ -89,11 +89,9 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
 
     setLoading(true);
     setError('');
-    setSuccess('');
-
-    try {
+    setSuccess('');    try {
       const billData = {
-        description: formData.description,
+        description: formData.description || 'Aucune description',
         amount: parseFloat(formData.amount),
         status: formData.status
       };
@@ -247,18 +245,17 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                     Description
                   </label>
                   {isEditing ? (
-                    <input
-                      type="text"
+                    <textarea
+                      type="textarea"
                       name="description"
                       value={formData.description}
+                      placeholder='Aucune description'
                       onChange={handleChange}
                       className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md"
-                      required
-                    />
-                  ) : (
-                    <input
-                      type="text"
-                      value={initialData?.description || ''}
+                    />                  ) : (
+                    <textarea
+                      value={initialData?.description || 'Aucune description'}
+                      placeholder='Aucune description'
                       className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
                       disabled
                     />
@@ -349,36 +346,47 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
 
           {/* Pied de page fixe avec les boutons */}
           <div className="border-t border-gray-200 p-4 sm:p-6 bg-gray-50">
-            <div className="flex justify-end space-x-3">
-              {isEditing ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setIsEditing(false)}
-                    className="px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    disabled={loading}
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    type="submit"
-                    form="billForm"
-                    onClick={handleSubmit}
-                    className="px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-                    disabled={loading}
-                  >
-                    {loading ? 'Enregistrement...' : 'Enregistrer'}
-                  </button>
-                </>
-              ) : (
+            <div className="flex justify-between space-x-3">
+              {isAdmin && !isEditing && (
                 <button
                   type="button"
-                  onClick={onClose}
-                  className="px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  onClick={handleDelete}
+                  className="px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                 >
-                  Fermer
+                  Supprimer
                 </button>
               )}
+              <div className="flex justify-end space-x-3">
+                {isEditing ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(false)}
+                      className="px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      disabled={loading}
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      type="submit"
+                      form="billForm"
+                      onClick={handleSubmit}
+                      className="px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                      disabled={loading}
+                    >
+                      {loading ? 'Enregistrement...' : 'Enregistrer'}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Fermer
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

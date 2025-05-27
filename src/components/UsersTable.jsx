@@ -56,7 +56,12 @@ const UsersTable = ({ users, onUsersListChanged }) => {
       setDeletingUser(userToDelete.email);
       await deleteUser(userToDelete.email);
       if (onUsersListChanged) {
-        onUsersListChanged({ type: 'delete', user: userToDelete });
+        // On passe une action spéciale pour indiquer que les factures doivent aussi être rafraîchies
+        onUsersListChanged({ 
+          type: 'delete', 
+          user: userToDelete,
+          shouldRefreshBills: true // Nouveau flag pour indiquer de rafraîchir les factures
+        });
       }
       showNotification('Utilisateur supprimé avec succès', 'success');
     } catch (error) {
@@ -103,7 +108,6 @@ const UsersTable = ({ users, onUsersListChanged }) => {
                   <th className="py-3 px-4">Nom</th>
                   <th className="py-3 px-4">Email</th>
                   <th className="py-3 px-4">Rôle</th>
-                  <th className="py-3 px-4">Description</th>
                   <th className="py-3 px-4">Date de création</th>
                   <th className="py-3 px-4">Actions</th>
                 </tr>
@@ -132,9 +136,6 @@ const UsersTable = ({ users, onUsersListChanged }) => {
                         }`}>
                         {formatRole(user.role)}
                       </span>
-                    </td>
-                    <td className="py-4 px-4 text-gray-600">
-                      {user.description || 'Aucune description'}
                     </td>
                     <td className="py-4 px-4 text-gray-600">
                       {formatDate(user.createdAt)}

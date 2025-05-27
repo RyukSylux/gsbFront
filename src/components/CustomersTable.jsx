@@ -11,8 +11,48 @@ import { TableLoadingScreen } from '../components/LoadingScreen';
 const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBillsDeleted, loading, error }) => {
   const [selectedBills, setSelectedBills] = useState([]);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [filters, setFilters] = useState({});
   const { showNotification } = useNotification();
-
+  // Filtrer les clients en fonction des critères
+  const filteredCustomers = customers.filter(customer => {
+    return Object.entries(filters).every(([key, value]) => {
+      if (!value) return true;
+      
+      switch (key) {
+        case 'name': {
+          return customer.name?.toLowerCase().includes(value.toLowerCase());
+        }
+        case 'email': {
+          return customer.email?.toLowerCase().includes(value.toLowerCase());
+        }
+        case 'description': {
+          return customer.description?.toLowerCase().includes(value.toLowerCase());
+        }        
+        case 'date': {
+          const filterDate = new Date(value).setHours(0, 0, 0, 0);
+          const customerDate = new Date(customer.date).setHours(0, 0, 0, 0);
+          return customerDate === filterDate;
+        }
+        case 'createdAt': {
+          const filterDate = new Date(value).setHours(0, 0, 0, 0);
+          const createdDate = new Date(customer.createdAt).setHours(0, 0, 0, 0);
+          return createdDate === filterDate;
+        }
+        case 'status': {
+          return customer.status === value;
+        }
+        case 'minAmount': {
+          return !value || parseFloat(customer.amount) >= parseFloat(value);
+        }
+        case 'maxAmount': {
+          return !value || parseFloat(customer.amount) <= parseFloat(value);
+        }
+        default:
+          return true;
+      }
+    });
+  });
+  // Utiliser les données filtrées pour la pagination
   const {
     currentItems: currentCustomers,
     currentPage,
@@ -21,7 +61,7 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
     paginate,
     nextPage,
     prevPage,
-  } = usePagination(customers, 5);
+  } = usePagination(filteredCustomers, 5);
 
   // Réinitialiser la sélection quand les factures changent
   useEffect(() => {
@@ -82,11 +122,20 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
         setIsDeleting(false);
       }
     }
-  };
-  const handleRowClick = (bill) => {
+  };  const handleRowClick = (bill) => {
     if (onBillClick) {
       onBillClick(bill);
     }
+  };
+
+  const handleFilterChange = (field, value) => {
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      [field]: value
+    }));
+    
+    // Réinitialiser la pagination lors du changement de filtre
+    setCurrentPage(1);
   };
 
   if (loading) {
@@ -110,7 +159,7 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
       </div>
     );
   }
-
+  // Message si aucune facture
   if (!customers.length) {
     return (
       <div className="text-center py-12">
@@ -136,6 +185,9 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
     );
   }
 
+  // Message si aucun résultat après filtrage
+  const hasActiveFilters = Object.values(filters).some(value => value !== '' && value !== null && value !== undefined);
+  const noFilterResults = hasActiveFilters && filteredCustomers.length === 0;
   return (
     <div className="space-y-4">
       <TableControls
@@ -144,36 +196,49 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
         onSelectAll={handleSelectAllBills}
         onDeleteSelected={handleDeleteSelected}
         isDeleting={isDeleting}
-        showActions={customers.length > 0}
-      />
+        showActions={customers.length > 0}      />
 
       <div className="relative bg-white shadow sm:rounded-lg">
         <div className="overflow-x-auto rounded-lg">
           <div className="inline-block min-w-full align-middle">
             <div className="overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <TableHeader
+              <table className="min-w-full divide-y divide-gray-200">                <TableHeader
                   showUserInfo={isAdmin}
                   onSelectAll={handleSelectAllBills}
                   isAllSelected={selectedBills.length > 0 && selectedBills.length === currentCustomers.length}
-                />
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {currentCustomers.map((bill, index) => {
-                    // Calculer l'index global de la facture
-                    const globalIndex = (currentPage - 1) * 5 + index; // 5 est itemsPerPage
-                    return (
-                      <TableRow
-                        key={bill._id}
-                        customer={bill}
-                        globalIndex={globalIndex}
-                        showUserInfo={isAdmin}
-                        onBillClick={handleRowClick}
-                        isSelected={selectedBills.includes(bill._id)}
-                        onSelect={(isSelected) => handleSelectBill(bill._id, isSelected)}
-                        onBillDeleted={handleBillDeleted}
-                      />
-                    );
-                  })}
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                />                <tbody className="bg-white divide-y divide-gray-200">
+                  {noFilterResults ? (
+                    <tr>
+                      <td colSpan={isAdmin ? 8 : 6} className="px-6 py-8 text-center">
+                        <div className="mx-auto w-12 h-12 text-gray-400 mb-4">
+                          <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                          </svg>
+                        </div>
+                        <h3 className="text-sm font-medium text-gray-900">Aucun résultat</h3>
+                        <p className="mt-1 text-sm text-gray-500">Aucune facture ne correspond aux critères de filtrage.</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    currentCustomers.map((bill, index) => {
+                      // Calculer l'index global de la facture
+                      const globalIndex = (currentPage - 1) * 5 + index; // 5 est itemsPerPage
+                      return (
+                        <TableRow
+                          key={bill._id}
+                          customer={bill}
+                          globalIndex={globalIndex}
+                          showUserInfo={isAdmin}
+                          onBillClick={handleRowClick}
+                          isSelected={selectedBills.includes(bill._id)}
+                          onSelect={(isSelected) => handleSelectBill(bill._id, isSelected)}
+                          onBillDeleted={handleBillDeleted}
+                        />
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
@@ -185,7 +250,7 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
           paginate={paginate}
           nextPage={nextPage}
           prevPage={prevPage}
-          totalItems={customers.length}
+          totalItems={filteredCustomers.length}
           itemLabel="factures"
         />
       </div>

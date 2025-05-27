@@ -11,7 +11,6 @@ const SignUp = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    description: '',
     role: 'user' // Par défaut, on met le rôle "user"
   });
   const [loading, setLoading] = useState(false);
@@ -113,18 +112,6 @@ const SignUp = () => {
                 onChange={handleChange}
                 placeholder="Entrez votre email professionnel"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                required
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block font-medium text-gray-700 mb-2">Description</label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Décrivez brièvement votre rôle"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 h-24"
                 required
               />
             </div>

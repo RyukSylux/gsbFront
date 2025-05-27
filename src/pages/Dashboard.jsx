@@ -95,14 +95,19 @@ const Dashboard = () => {
     }
   }, [isServerAwake, isAdmin, fetchBills]);
 
-  const handleUsersListChanged = (change) => {
+  const handleUsersListChanged = async (change) => {
     if (change.type === 'delete') {
       setUsers(prevUsers => prevUsers.filter(user => user.email !== change.user.email));
+      // Si l'action demande de rafraîchir les factures
+      if (change.shouldRefreshBills) {
+        await fetchBills();
+      }
     } else if (change.type === 'update') {
       setUsers(prevUsers => prevUsers.map(user => 
-        // Si l'email correspond à l'ancien email de l'utilisateur
         user.email === change.oldEmail ? change.user : user
       ));
+      // Rafraîchir les factures car le nom ou l'email de l'utilisateur peut avoir changé
+      await fetchBills();
     }
   };
 
