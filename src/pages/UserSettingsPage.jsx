@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Sidebar from '../components/layout/Sidebar';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
 
 const UserSettingsPage = () => {
   const { user, login } = useAuth();

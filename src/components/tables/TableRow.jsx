@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { authAPI } from '../services/api';
-import { useNotification } from '../contexts/NotificationContext';
-import ConfirmModal from './ConfirmModal';
+import { authAPI } from '../../services/api';
+import { useNotification } from '../../contexts/NotificationContext';
+import ConfirmModal from '../modals/ConfirmModal';
 
 const getStatusColor = (status) => {
   switch (status) {

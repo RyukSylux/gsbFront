@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { authAPI } from '../services/api';
-import { useNotification } from '../contexts/NotificationContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { authAPI } from '../../services/api';
+import { useNotification } from '../../contexts/NotificationContext';
 
 const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
   const { isAdmin } = useAuth();

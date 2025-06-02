@@ -1,7 +1,7 @@
 import React from 'react';
-import SearchBar from './SearchBar';
+import SearchBar from '../ui/SearchBar';
 import Navigation from './Navigation';
-import Settings from './Settings';
+import Settings from '../settings/Settings';
 
 const Sidebar = ({ isOpen, onClose }) => {
   return (

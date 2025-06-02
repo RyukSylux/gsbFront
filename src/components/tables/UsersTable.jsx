@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useNotification } from '../contexts/NotificationContext';
-import EditUserModal from './EditUserModal';
-import ConfirmModal from './ConfirmModal';
-import { usePagination } from '../hooks/usePagination';
-import Pagination from './Pagination';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNotification } from '../../contexts/NotificationContext';
+import EditUserModal from '../modals/EditUserModal';
+import ConfirmModal from '../modals/ConfirmModal';
+import { usePagination } from '../../hooks/usePagination';
+import Pagination from '../ui/Pagination';
 
 const UsersTable = ({ users, onUsersListChanged }) => {
   const { deleteUser, updateUser } = useAuth();

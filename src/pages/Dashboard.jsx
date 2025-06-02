@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
-import CustomersTable from '../components/CustomersTable';
-import UsersTable from '../components/UsersTable';
-import BillModal from '../components/BillModal';
-import NewBillModal from '../components/NewBillModal';
-import Footer from '../components/Footer';
+import Sidebar from '../components/layout/Sidebar';
+import Header from '../components/layout/Header';
+import CustomersTable from '../components/tables/CustomersTable';
+import UsersTable from '../components/tables/UsersTable';
+import BillModal from '../components/modals/BillModal';
+import NewBillModal from '../components/modals/NewBillModal';
+import Footer from '../components/layout/Footer';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
-import { TableLoadingScreen, NoDataScreen } from '../components/LoadingScreen';
+import { TableLoadingScreen, NoDataScreen } from '../components/ui/LoadingScreen';
 
 const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

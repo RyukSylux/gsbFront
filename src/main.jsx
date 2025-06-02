@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { NotificationProvider } from './contexts/NotificationContext'
-import NotificationsContainer from './components/NotificationsContainer'
+import NotificationsContainer from './components/notifications/NotificationsContainer'
 import AppRoutes from './routes/AppRoutes'
 import './index.css'
 

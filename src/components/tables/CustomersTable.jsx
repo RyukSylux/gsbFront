@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import TableHeader from './TableHeader';
 import TableRow from './TableRow';
 import TableControls from './TableControls';
-import Pagination from './Pagination';
-import { usePagination } from '../hooks/usePagination';
-import { authAPI } from '../services/api';
-import { useNotification } from '../contexts/NotificationContext';
-import { TableLoadingScreen } from '../components/LoadingScreen';
+import Pagination from '../ui/Pagination';
+import { usePagination } from '../../hooks/usePagination';
+import { authAPI } from '../../services/api';
+import { useNotification } from '../../contexts/NotificationContext';
+import { TableLoadingScreen } from '../ui/LoadingScreen';
 
 const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBillsDeleted, loading, error }) => {
   const [selectedBills, setSelectedBills] = useState([]);

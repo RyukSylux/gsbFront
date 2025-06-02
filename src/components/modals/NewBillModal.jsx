@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { authAPI } from '../services/api';
-import { ocrService } from '../services/ocrService';
-import { useNotification } from '../contexts/NotificationContext';
+import { authAPI } from '../../services/api';
+import { ocrService } from '../../services/ocrService';
+import { useNotification } from '../../contexts/NotificationContext';
 
 const NewBillModal = ({ isOpen, onClose, onSave }) => {
   const { showNotification } = useNotification();
