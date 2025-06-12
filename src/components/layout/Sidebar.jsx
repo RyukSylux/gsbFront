@@ -1,5 +1,4 @@
 import React from 'react';
-import SearchBar from '../ui/SearchBar';
 import Navigation from './Navigation';
 import Settings from '../settings/Settings';
 
@@ -34,7 +33,6 @@ const Sidebar = ({ isOpen, onClose }) => {
               </svg>
             </button>
           </div>
-          <SearchBar />
         </div>
         
         <Navigation />
