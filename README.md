@@ -21,9 +21,29 @@ This project is a web application developed as part of the E5 exam for the BTS S
 - **Notifications**: User feedback for actions and errors
 - **Responsive Design**: Usable on desktop and mobile
 
+## Test Credentials
+
+The following accounts can be used for testing the application:
+
+### Administrator
+- **Email**: test@gmail.com
+- **Password**: test
+
+### Standard User
+- **Email**: hugo@gmail.com
+- **Password**: hugo
+
+### Commercial
+- **Email**: pablito@gmail.com
+- **Password**: pablito1
+
+---
+
 ## Technical Stack
-- **Frontend**: React 18, Vite, Tailwind CSS
+- **Frontend**: React 19, Vite, Tailwind CSS
 - **OCR**: Tesseract.js (v4.1.1)
+- **UI Components**: Headless UI, Heroicons
+- **Library**: Date-fns for date manipulation
 - **State Management**: React Context API
 - **API Communication**: Axios
 - **Authentication**: JWT (handled by backend)
@@ -40,6 +60,8 @@ This project is a web application developed as part of the E5 exam for the BTS S
 2. Install dependencies: `npm install`
 3. Configure the API URL in `.env` if needed
 4. Start the development server: `npm run dev`
+5. Build for production: `npm run build`
+6. Preview production build: `npm run preview`
 
 ## Author & Context
 - **Author**: Morgan Bourré
@@ -53,5 +75,3 @@ This project is a web application developed as part of the E5 exam for the BTS S
 - Ensure security and data integrity
 - Provide a user-friendly and professional interface
 
----
-This project demonstrates skills in modern web development, business process digitalization, and professional software engineering for the BTS SIO SLAM curriculum.
