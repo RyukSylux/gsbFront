@@ -1,77 +1,83 @@
-# GSB Expense Management - React Frontend
+# Gestion des Frais GSB - Frontend React
 
-## Project Overview
-This project is a web application developed as part of the E5 exam for the BTS SIO (Services Informatiques aux Organisations), SLAM (Solutions Logicielles et Applications Métiers) option. The application is designed for the management and digitalization of expense reports for the GSB (Galaxy Swiss Bourdin) company.
+## Présentation du Projet
+Ce projet est une application web développée dans le cadre de l'épreuve E6 du BTS SIO (Services Informatiques aux Organisations), option SLAM (Solutions Logicielles et Applications Métiers). L'application est conçue pour la gestion et la dématérialisation des notes de frais pour l'entreprise GSB (Galaxy Swiss Bourdin).
 
-## Main Features
-- **User Authentication**: Secure login and session management.
-- **Expense Submission**: Users can create new expense reports (bills) with the following features:
-  - Upload a receipt (image or PDF)
-  - Automatic extraction of description, total amount, and date using OCR (Tesseract.js)
-  - Manual entry if OCR fails
-  - Date picker for expense date
-- **Expense List & Filtering**:
-  - Display all submitted expenses in a table
-  - Filter by description, date, creation date, status, and amount (min/max)
-  - Sort and search functionalities
-- **Admin Features**:
-  - View all users and their expenses
-  - Edit or delete users and expenses
-  - Bulk actions (select and delete multiple bills)
-- **Notifications**: User feedback for actions and errors
-- **Responsive Design**: Usable on desktop and mobile
+## Dépôt Backend
+Le code source de l'API backend de ce projet est disponible ici : [RyukSylux/gsbBackend](https://github.com/RyukSylux/gsbBackend).
 
-## Test Credentials
+## Fonctionnalités Principales
+- **Authentification Utilisateur** : Connexion sécurisée et gestion des sessions.
+- **Soumission de Notes de Frais** : Les utilisateurs peuvent créer de nouvelles notes de frais (factures) avec les fonctionnalités suivantes :
+  - Téléchargement d'un justificatif (image ou PDF)
+  - Extraction automatique de la description, du montant total et de la date via OCR (Tesseract.js)
+  - Saisie manuelle en cas d'échec de l'OCR
+  - Sélecteur de date pour la date de la dépense
+- **Liste des Notes de Frais & Filtrage** :
+  - Affichage de toutes les notes de frais soumises dans un tableau
+  - Filtrage par description, date, date de création, statut et montant (min/max)
+  - Fonctionnalités de tri et de recherche
+- **Fonctionnalités Administrateur** :
+  - Consulter tous les utilisateurs et leurs notes de frais
+  - Modifier ou supprimer des utilisateurs et des notes de frais
+  - Actions en masse (sélectionner et supprimer plusieurs factures)
+- **Notifications** : Retours visuels pour les actions de l'utilisateur et les erreurs
+- **Design Responsive** : Utilisable sur ordinateur et mobile
 
-The following accounts can be used for testing the application:
+## Comptes de Test
 
-### Administrator
-- **Email**: test@gmail.com
-- **Password**: test
+> **⚠️ AVERTISSEMENT DE SÉCURITÉ** : Les mots de passe ci-dessous sont volontairement triviaux car ils sont exclusivement réservés à un **environnement de démonstration** (comme notre déploiement Vercel). Ils ne doivent en aucun cas être utilisés sur un environnement de production réel.
 
-### Standard User
-- **Email**: hugo@gmail.com
-- **Password**: hugo
+Les comptes suivants peuvent être utilisés pour tester l'application :
+
+### Administrateur
+- **Email** : test@gmail.com
+- **Mot de passe** : test
+
+### Utilisateur Standard
+- **Email** : hugo@gmail.com
+- **Mot de passe** : hugo
 
 ### Commercial
-- **Email**: pablito@gmail.com
-- **Password**: pablito1
+- **Email** : pablito@gmail.com
+- **Mot de passe** : pablito1
 
 ---
 
-## Technical Stack
-- **Frontend**: React 19, Vite, Tailwind CSS
-- **OCR**: Tesseract.js (v4.1.1)
-- **UI Components**: Headless UI, Heroicons
-- **Library**: Date-fns for date manipulation
-- **State Management**: React Context API
-- **API Communication**: Axios
-- **Authentication**: JWT (handled by backend)
+## Stack Technique
+- **Frontend** : React 19, Vite, Tailwind CSS
+- **OCR** : Tesseract.js (v4.1.1)
+- **Composants UI** : Headless UI, Heroicons
+- **Bibliothèque** : Date-fns pour la manipulation des dates
+- **Gestion d'État** : API React Context
+- **Communication API** : Axios
+- **Authentification** : JWT (géré par le backend)
 
-## Project Structure
-- `src/components/` : UI components (tables, modals, layout, etc.)
-- `src/services/` : API and OCR service logic
-- `src/contexts/` : Context providers (auth, notifications)
-- `src/pages/` : Main application pages
-- `src/hooks/` : Custom React hooks
+## Structure du Projet
+- `src/components/` : Composants UI (tableaux, modales, mise en page, etc.)
+- `src/services/` : Logique de l'API et du service OCR
+- `src/contexts/` : Fournisseurs de contexte (authentification, notifications)
+- `src/pages/` : Pages principales de l'application
+- `src/hooks/` : Hooks React personnalisés
 
-## How to Run
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Configure the API URL in `.env` if needed
-4. Start the development server: `npm run dev`
-5. Build for production: `npm run build`
-6. Preview production build: `npm run preview`
+## Installation et Lancement
+1. Cloner le dépôt
+2. Installer les dépendances : `npm install`
+3. Configurer l'environnement : 
+   - Copier le fichier `.env.example` et le renommer en `.env`
+   - S'assurer que la variable `VITE_API_URL` est bien définie (par défaut : `http://localhost:3000` pointant vers le backend local)
+4. Démarrer le serveur de développement : `npm run dev`
+5. Construire pour la production : `npm run build`
+6. Prévisualiser la version de production : `npm run preview`
 
-## Author & Context
-- **Author**: Morgan Bourré
-- **Context**: BTS SIO SLAM - E5 Project (Professional Project)
-- **Company**: Galaxy Swiss Bourdin (GSB)
-- **Year**: 2025
+## Auteur & Contexte
+- **Auteur** : Morgan Bourré
+- **Contexte** : BTS SIO SLAM - Épreuve E6 (Projet Professionnel)
+- **Entreprise** : Galaxy Swiss Bourdin (GSB)
+- **Année** : 2025
 
-## Exam Objectives (E5 - SLAM)
-- Design and develop a business application
-- Implement data processing and automation (OCR)
-- Ensure security and data integrity
-- Provide a user-friendly and professional interface
-
+## Objectifs de l'Épreuve (E6 - SLAM)
+- Concevoir et développer une application métier
+- Implémenter le traitement des données et l'automatisation (OCR)
+- Assurer la sécurité et l'intégrité des données
+- Fournir une interface ergonomique et professionnelle
