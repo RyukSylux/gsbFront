@@ -11,6 +11,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
     description: '',
     amount: '',
     status: '',
+    category: '',
     proof: null
   });
   const [error, setError] = useState('');
@@ -24,6 +25,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
         description: initialData.description || '',
         amount: initialData.amount || '',
         status: initialData.status || 'pending',
+        category: initialData.category || 'Autre',
         proof: initialData.proof || null
       });
     }
@@ -33,8 +35,11 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
     switch (status) {
       case 'paid':
         return 'bg-green-100 text-green-800';
+      case 'remboursé':
+        return 'bg-blue-100 text-blue-800';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
+      case 'not-paid':
       case 'not paid':
         return 'bg-red-100 text-red-800';
       default:
@@ -46,8 +51,11 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
     switch (status) {
       case 'paid':
         return 'Payé';
+      case 'remboursé':
+        return 'Remboursé';
       case 'pending':
         return 'En attente';
+      case 'not-paid':
       case 'not paid':
         return 'Non payé';
       default:
@@ -93,7 +101,8 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
       const billData = {
         description: formData.description || 'Aucune description',
         amount: parseFloat(formData.amount),
-        status: formData.status
+        status: formData.status,
+        category: formData.category
       };
 
       // Ajout du justificatif uniquement s'il a été modifié
@@ -300,6 +309,32 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Catégorie
+                  </label>
+                  {isEditing ? (
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md"
+                    >
+                      <option value="Transport">Transport</option>
+                      <option value="Hébergement">Hébergement</option>
+                      <option value="Restauration">Restauration</option>
+                      <option value="Autre">Autre</option>
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={initialData?.category || 'Autre'}
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
+                      disabled
+                    />
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Statut
                   </label>
                   {isEditing ? (
@@ -311,7 +346,8 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                     >
                       <option value="pending">En attente</option>
                       <option value="paid">Payé</option>
-                      <option value="not paid">Non payé</option>
+                      <option value="not-paid">Non payé</option>
+                      <option value="remboursé">Remboursé</option>
                     </select>
                   ) : (
                     <div className="mt-1">

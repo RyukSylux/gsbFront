@@ -6,6 +6,7 @@ import SignIn from '../pages/SignIn';
 import SignUp from '../pages/SignUp';
 import Dashboard from '../pages/Dashboard';
 import UserSettingsPage from '../pages/UserSettingsPage';
+import Stats from '../pages/Stats';
 import Home from '../pages/Home';
 
 // Composant de protection des routes
@@ -33,6 +34,14 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <Dashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/stats"
+        element={
+          <PrivateRoute>
+            <Stats />
           </PrivateRoute>
         }
       />
