@@ -14,7 +14,9 @@ export const ocrService = {
       await this.worker.initialize('fra');
     }
     return this.worker;
-  },  async analyzeImage(file) {
+  },
+
+  async analyzeImage(file) {
     try {
       console.log('Démarrage de l\'analyse OCR...');
       const worker = await this.initWorker();
@@ -24,12 +26,15 @@ export const ocrService = {
       const imageUrl = URL.createObjectURL(file);
       console.log('Image convertie en URL:', imageUrl);
       
-      // Effectuer l'OCR      console.log('Début de la reconnaissance...');
+      // Effectuer l'OCR
+      console.log('Début de la reconnaissance...');
       const { data } = await worker.recognize(imageUrl);
       console.log('Texte extrait:', data.text);
       
       // Libérer l'URL
-      URL.revokeObjectURL(imageUrl);      // Analyser le texte pour extraire les informations pertinentes
+      URL.revokeObjectURL(imageUrl);
+
+      // Analyser le texte pour extraire les informations pertinentes
       const description = this.extractDescription(data.text);
       const amount = this.extractAmount(data.text);
       const date = this.extractDate(data.text);

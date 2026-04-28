@@ -21,10 +21,10 @@ L'interface frontend de GSB est une application **Single Page Application (SPA)*
 ## ✨ Fonctionnalités Principales
 - **Authentification Sécurisée** : Connexion via JWT avec stratégie hybride (Cookies httpOnly + LocalStorage) pour une compatibilité Mac/Safari.
 - **Soumission avec OCR** : Extraction automatique des données (description, montant, date) à partir des justificatifs.
-- **Tableau de Bord Dynamique** : Liste des frais avec filtrage multi-critères (date, statut, montant, nom).
+- **Tableau de Bord Dynamique** : Liste des frais avec filtrage multi-critères (date, statut, montant, nom, catégorie).
 - **Espace Admin** : 
   - Gestion des utilisateurs (CRUD).
-  - Statistiques graphiques des dépenses par statut.
+  - Statistiques graphiques des dépenses par catégorie.
   - Actions groupées (suppression multiple).
 - **Responsive Design** : Interface optimisée pour mobile et desktop via Tailwind CSS.
 

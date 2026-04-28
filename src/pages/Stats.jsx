@@ -30,14 +30,14 @@ const Stats = () => {
   const getStatusInfo = (status) => {
     switch (status) {
       case 'paid': 
-        return { label: 'Payé', color: '#10b981', gradient: 'from-emerald-500 to-teal-600' };
+        return { label: 'Validé', color: '#10b981', gradient: 'from-emerald-500 to-teal-600' };
       case 'remboursé': 
         return { label: 'Remboursé', color: '#4f46e5', gradient: 'from-blue-500 to-indigo-600' };
       case 'pending': 
         return { label: 'En attente', color: '#f59e0b', gradient: 'from-amber-400 to-orange-500' };
       case 'not-paid':
       case 'not paid': 
-        return { label: 'Non payé', color: '#ef4444', gradient: 'from-rose-500 to-red-600' };
+        return { label: 'Refusé', color: '#ef4444', gradient: 'from-rose-500 to-red-600' };
       default: 
         return { label: status, color: '#6b7280', gradient: 'from-gray-500 to-gray-600' };
     }
@@ -55,13 +55,22 @@ const Stats = () => {
     return acc;
   }, []);
 
-
+  const categoryData = stats.reduce((acc, curr) => {
+    const category = curr._id.category || 'Autre';
+    const existing = acc.find(item => item.name === category);
+    if (existing) {
+      existing.value += curr.totalAmount;
+    } else {
+      acc.push({ name: category, value: curr.totalAmount });
+    }
+    return acc;
+  }, []).sort((a, b) => b.value - a.value);
   // Grouper les stats par statut pour les cartes détaillées
   const groupedStats = stats.reduce((acc, curr) => {
     const status = curr._id.status;
-    if (!acc[status]) acc[status] = { total: 0, count: 0 };
+    if (!acc[status]) acc[status] = { categories: [], total: 0 };
+    acc[status].categories.push({ category: curr._id.category, amount: curr.totalAmount, count: curr.count });
     acc[status].total += curr.totalAmount;
-    acc[status].count += curr.count;
     return acc;
   }, {});
 
@@ -114,7 +123,7 @@ const Stats = () => {
               ) : (
                 <>
                   {/* Section Graphiques */}
-                  <div className="grid grid-cols-1 gap-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Camembert des Statuts */}
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                       <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center">
@@ -146,6 +155,25 @@ const Stats = () => {
                       </div>
                     </div>
 
+                    {/* Barres des Catégories */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                      <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center">
+                        <span className="w-2 h-6 bg-emerald-500 rounded-full mr-3"></span>
+                        Volume par Catégorie
+                      </h3>
+                      <div className="h-[300px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={categoryData} layout="vertical">
+                            <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f1f5f9" />
+                            <XAxis type="number" hide />
+                            <YAxis dataKey="name" type="category" width={100} axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 500 }} />
+                            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
+                            <Bar dataKey="value" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={20} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+
                   </div>
 
                   {/* Cartes Détails */}
@@ -160,9 +188,13 @@ const Stats = () => {
                               <span className="text-2xl font-black">{data.total.toLocaleString('fr-FR')} €</span>
                             </div>
                           </div>
-                          <div className="p-5 flex-1 flex flex-col justify-center items-center">
-                            <span className="text-sm text-slate-500">Nombre de factures</span>
-                            <span className="text-3xl font-bold text-slate-900">{data.count}</span>
+                          <div className="p-5 flex-1 space-y-4">
+                            {data.categories.map((cat, idx) => (
+                              <div key={idx} className="flex justify-between items-center">
+                                <span className="text-sm text-slate-600 font-medium">{cat.category || 'Autre'}</span>
+                                <span className="text-sm font-bold text-slate-900">{cat.amount.toLocaleString('fr-FR')} €</span>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       );

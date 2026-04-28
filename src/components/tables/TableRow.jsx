@@ -22,14 +22,14 @@ const getStatusColor = (status) => {
 const getStatusLabel = (status) => {
   switch (status) {
     case 'paid':
-      return 'Payé';
+      return 'Validé';
     case 'remboursé':
       return 'Remboursé';
     case 'pending':
       return 'En attente';
     case 'not paid':
     case 'not-paid':
-      return 'Non payé';
+      return 'Refusé';
     default:
       return status;
   }

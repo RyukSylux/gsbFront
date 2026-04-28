@@ -186,7 +186,8 @@ export const authAPI = {
         amount: billData.amount,
         status: billData.status,
         type: billData.type,
-        date: billData.date
+        date: billData.date,
+        category: billData.category || 'Autre'
       };
       formData.append('metadata', JSON.stringify(metadata));
       if (billData.proof instanceof File) {
@@ -225,22 +226,6 @@ export const authAPI = {
       };
     } catch (error) {
       throw handleApiError(error);
-    }
-  },
-
-  analyzeReceipt: async (file) => {
-    try {
-      const formData = new FormData();
-      formData.append('receipt', file);
-      const response = await api.post('/bills/analyze', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      return {
-        description: response.data.description || '',
-        amount: response.data.amount || '',
-      };
-    } catch (error) {
-      return { description: '', amount: '' };
     }
   },
 
