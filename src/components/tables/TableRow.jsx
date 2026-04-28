@@ -7,9 +7,12 @@ const getStatusColor = (status) => {
   switch (status) {
     case 'paid':
       return 'bg-green-100 text-green-800';
+    case 'remboursé':
+      return 'bg-blue-100 text-blue-800';
     case 'pending':
       return 'bg-yellow-100 text-yellow-800';
     case 'not paid':
+    case 'not-paid':
       return 'bg-red-100 text-red-800';
     default:
       return 'bg-gray-100 text-gray-800';
@@ -20,9 +23,12 @@ const getStatusLabel = (status) => {
   switch (status) {
     case 'paid':
       return 'Payé';
+    case 'remboursé':
+      return 'Remboursé';
     case 'pending':
       return 'En attente';
     case 'not paid':
+    case 'not-paid':
       return 'Non payé';
     default:
       return status;
@@ -33,7 +39,7 @@ const formatDate = (dateString) => {
   if (!dateString) return '';
   // Si la date est déjà au format DD/MM/YYYY, on la retourne telle quelle
   if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) return dateString;
-  
+
   // Sinon on la convertit
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, '0');

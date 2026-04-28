@@ -1,83 +1,131 @@
-# Gestion des Frais GSB - Frontend React
+# 📱 Gestion des Frais GSB - Interface React
 
-## Présentation du Projet
-Ce projet est une application web développée dans le cadre de l'épreuve E6 du BTS SIO (Services Informatiques aux Organisations), option SLAM (Solutions Logicielles et Applications Métiers). L'application est conçue pour la gestion et la dématérialisation des notes de frais pour l'entreprise GSB (Galaxy Swiss Bourdin).
-
-## Dépôt Backend
-Le code source de l'API backend de ce projet est disponible ici : [RyukSylux/gsbBackend](https://github.com/RyukSylux/gsbBackend).
-
-## Fonctionnalités Principales
-- **Authentification Utilisateur** : Connexion sécurisée et gestion des sessions.
-- **Soumission de Notes de Frais** : Les utilisateurs peuvent créer de nouvelles notes de frais (factures) avec les fonctionnalités suivantes :
-  - Téléchargement d'un justificatif (image ou PDF)
-  - Extraction automatique de la description, du montant total et de la date via OCR (Tesseract.js)
-  - Saisie manuelle en cas d'échec de l'OCR
-  - Sélecteur de date pour la date de la dépense
-- **Liste des Notes de Frais & Filtrage** :
-  - Affichage de toutes les notes de frais soumises dans un tableau
-  - Filtrage par description, date, date de création, statut et montant (min/max)
-  - Fonctionnalités de tri et de recherche
-- **Fonctionnalités Administrateur** :
-  - Consulter tous les utilisateurs et leurs notes de frais
-  - Modifier ou supprimer des utilisateurs et des notes de frais
-  - Actions en masse (sélectionner et supprimer plusieurs factures)
-- **Notifications** : Retours visuels pour les actions de l'utilisateur et les erreurs
-- **Design Responsive** : Utilisable sur ordinateur et mobile
-
-## Comptes de Test
-
-> **⚠️ AVERTISSEMENT DE SÉCURITÉ** : Les mots de passe ci-dessous sont volontairement triviaux car ils sont exclusivement réservés à un **environnement de démonstration** (comme notre déploiement Vercel). Ils ne doivent en aucun cas être utilisés sur un environnement de production réel.
-
-Les comptes suivants peuvent être utilisés pour tester l'application :
-
-### Administrateur
-- **Email** : test@gmail.com
-- **Mot de passe** : test
-
-### Utilisateur Standard
-- **Email** : hugo@gmail.com
-- **Mot de passe** : hugo
-
-### Commercial
-- **Email** : pablito@gmail.com
-- **Mot de passe** : pablito1
+## 📝 Présentation du Projet
+L'interface frontend de GSB est une application **Single Page Application (SPA)** moderne développée en React. Elle permet aux collaborateurs de soumettre leurs notes de frais avec une extraction automatisée des données via OCR.
 
 ---
 
-## Stack Technique
-- **Frontend** : React 19, Vite, Tailwind CSS
-- **OCR** : Tesseract.js (v4.1.1)
-- **Composants UI** : Headless UI, Heroicons
-- **Bibliothèque** : Date-fns pour la manipulation des dates
-- **Gestion d'État** : API React Context
-- **Communication API** : Axios
-- **Authentification** : JWT (géré par le backend)
+## 📋 Table des Matières
+- [Processus OCR](#processus-ocr)
+- [Authentification Hybride](#authentification-hybride)
+- [Fonctionnalités Principales](#fonctionnalités-principales)
+- [Comptes de Test](#comptes-de-test)
+- [Stack Technique](#stack-technique)
+- [Structure du Projet](#structure-du-projet)
+- [Installation & Lancement](#installation--lancement)
+- [Objectifs de l'Épreuve (E6 - SLAM)](#objectifs-de-lépreuve-e6---slam)
+- [Auteur](#auteur)
 
-## Structure du Projet
-- `src/components/` : Composants UI (tableaux, modales, mise en page, etc.)
-- `src/services/` : Logique de l'API et du service OCR
-- `src/contexts/` : Fournisseurs de contexte (authentification, notifications)
-- `src/pages/` : Pages principales de l'application
-- `src/hooks/` : Hooks React personnalisés
+---
 
-## Installation et Lancement
-1. Cloner le dépôt
-2. Installer les dépendances : `npm install`
-3. Configurer l'environnement : 
-   - Copier le fichier `.env.example` et le renommer en `.env`
-   - S'assurer que la variable `VITE_API_URL` est bien définie (par défaut : `http://localhost:3000` pointant vers le backend local)
-4. Démarrer le serveur de développement : `npm run dev`
-5. Construire pour la production : `npm run build`
-6. Prévisualiser la version de production : `npm run preview`
+## ✨ Fonctionnalités Principales
+- **Authentification Sécurisée** : Connexion via JWT avec stratégie hybride (Cookies httpOnly + LocalStorage) pour une compatibilité Mac/Safari.
+- **Soumission avec OCR** : Extraction automatique des données (description, montant, date) à partir des justificatifs.
+- **Tableau de Bord Dynamique** : Liste des frais avec filtrage multi-critères (date, statut, montant, nom).
+- **Espace Admin** : 
+  - Gestion des utilisateurs (CRUD).
+  - Statistiques graphiques des dépenses par statut.
+  - Actions groupées (suppression multiple).
+- **Responsive Design** : Interface optimisée pour mobile et desktop via Tailwind CSS.
 
-## Auteur & Contexte
+---
+
+## 👁️ Processus OCR (Automatisation)
+L'une des fonctionnalités phares est l'extraction automatique de données via IA locale :
+
+```text
+[ Fichier Image ] --> [ Service OCR (Tesseract.js) ]
+                             |
+                             v
+               +-------------+-------------+
+               |   Moteur de reconnaissance  |
+               |      (Analyse locale)       |
+               +-------------+-------------+
+                             |
+         +-------------------+-------------------+
+         |                   |                   |
+    [ Description ]      [ Montant ]          [ Date ]
+         |                   |                   |
+         v                   v                   v
+    +---------------------------------------------+
+    |         Pré-remplissage du Formulaire       |
+    |         (Vérification par l'utilisateur)    |
+    +---------------------------------------------+
+```
+
+---
+
+## 🔒 Authentification Hybride
+Pour garantir une compatibilité universelle (notamment pour les utilisateurs **macOS/Safari**), nous utilisons une stratégie de session double :
+
+```text
+1. Login --> Le serveur renvoie un Cookie httpOnly + un Token JSON.
+2. Front --> Stocke le Token dans LocalStorage (Fallback).
+3. Request --> Axios injecte automatiquement :
+   - Le Cookie (natif navigateur)
+   - Le Header "Authorization: Bearer <token>" (intercepteur Axios)
+```
+
+---
+
+## 👥 Comptes de Test
+
+### Administrateur
+- **Email** : `test@gmail.com`
+- **Mot de passe** : `test`
+
+### Utilisateur Standard
+- **Email** : `hugo@gmail.com`
+- **Mot de passe** : `hugo`
+
+### Commercial
+- **Email** : `pablito@gmail.com`
+- **Mot de passe** : `pablito1`
+
+---
+
+## 🛠️ Stack Technique
+- **React 19 & Vite** : Bibliothèque UI et outil de build.
+- **Tailwind CSS** : Framework CSS utilitaire.
+- **Tesseract.js** : OCR (Reconnaissance de caractères) côté client.
+- **React Router 7** : Gestion de la navigation et des routes privées.
+- **Axios** : Client HTTP avec intercepteurs.
+- **Recharts** : Bibliothèque de graphiques (Statistiques).
+- **Headless UI & Heroicons** : Composants et icônes.
+- **Date-fns** : Manipulation des dates.
+- **Context API** : Gestion de l'état global.
+
+---
+
+## 📂 Structure du Projet
+- `src/components/` : Composants UI (Modales, Tableaux, Layout).
+- `src/services/` : Client API et logique OCR.
+- `src/contexts/` : Fournisseurs d'état (Auth, Notifications).
+- `src/pages/` : Vues principales (Dashboard, Stats, Login).
+- `src/hooks/` : Hooks personnalisés réutilisables.
+
+---
+
+## 🚀 Installation & Lancement
+1. **Installation** : `npm install`
+2. **Configuration** : Créer un fichier `.env` :
+   ```env
+   VITE_API_URL=http://localhost:3000/api
+   ```
+3. **Lancement** : `npm run dev`
+
+---
+
+## 🎓 Objectifs de l'Épreuve (E6 - SLAM)
+Ce projet valide les compétences métier suivantes :
+- **Développement** : Architecture d'une application complexe.
+- **Automatisation** : Intégration de services tiers et d'IA.
+- **Sécurité** : Protection des échanges et gestion des sessions.
+- **Ergonomie** : UX/UI moderne et responsive.
+
+---
+
+## 👨‍💻 Auteur
 - **Auteur** : Morgan Bourré
-- **Contexte** : BTS SIO SLAM - Épreuve E6 (Projet Professionnel)
+- **Contexte** : BTS SIO SLAM - Projet E6 (2025)
 - **Entreprise** : Galaxy Swiss Bourdin (GSB)
-- **Année** : 2025
-
-## Objectifs de l'Épreuve (E6 - SLAM)
-- Concevoir et développer une application métier
-- Implémenter le traitement des données et l'automatisation (OCR)
-- Assurer la sécurité et l'intégrité des données
-- Fournir une interface ergonomique et professionnelle

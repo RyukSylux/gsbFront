@@ -19,7 +19,6 @@ const NewBillModal = ({ isOpen, onClose, onSave }) => {
     description: '',
     amount: '',
     date: formatDate(new Date()),
-    category: 'Autre',
     proof: null
   });
   const [error, setError] = useState('');
@@ -100,7 +99,6 @@ const NewBillModal = ({ isOpen, onClose, onSave }) => {
           description: formData.description,
           amount: Number(formData.amount),
           date: formData.date,
-          category: formData.category,
           type: 'expense'
         },
         proof: formData.proof
@@ -110,7 +108,6 @@ const NewBillModal = ({ isOpen, onClose, onSave }) => {
         description: '',
         amount: '',
         date: formatDate(new Date()),
-        category: 'Autre',
         proof: null
       });
       showNotification('Facture créée avec succès', 'success');
@@ -202,23 +199,6 @@ const NewBillModal = ({ isOpen, onClose, onSave }) => {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Catégorie
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
-              >
-                <option value="Transport">Transport</option>
-                <option value="Hébergement">Hébergement</option>
-                <option value="Restauration">Restauration</option>
-                <option value="Autre">Autre</option>
-              </select>
-            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

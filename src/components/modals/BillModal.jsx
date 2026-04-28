@@ -11,7 +11,6 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
     description: '',
     amount: '',
     status: '',
-    category: '',
     proof: null
   });
   const [error, setError] = useState('');
@@ -25,7 +24,6 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
         description: initialData.description || '',
         amount: initialData.amount || '',
         status: initialData.status || 'pending',
-        category: initialData.category || 'Autre',
         proof: initialData.proof || null
       });
     }
@@ -101,8 +99,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
       const billData = {
         description: formData.description || 'Aucune description',
         amount: parseFloat(formData.amount),
-        status: formData.status,
-        category: formData.category
+        status: formData.status
       };
 
       // Ajout du justificatif uniquement s'il a été modifié
@@ -307,31 +304,6 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Catégorie
-                  </label>
-                  {isEditing ? (
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md"
-                    >
-                      <option value="Transport">Transport</option>
-                      <option value="Hébergement">Hébergement</option>
-                      <option value="Restauration">Restauration</option>
-                      <option value="Autre">Autre</option>
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      value={initialData?.category || 'Autre'}
-                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
-                      disabled
-                    />
-                  )}
-                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
