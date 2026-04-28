@@ -3,6 +3,8 @@
 ## 📝 Présentation du Projet
 L'interface frontend de GSB est une application **Single Page Application (SPA)** moderne développée en React. Elle permet aux collaborateurs de soumettre leurs notes de frais avec une extraction automatisée des données via OCR.
 
+🔗 **Dépôt Backend (API)** : Cette interface nécessite l'API backend pour la gestion des données, l'authentification sécurisée et le stockage des justificatifs sur AWS S3. Le code source est disponible ici : [https://github.com/RyukSylux/gsbBackend](https://github.com/RyukSylux/gsbBackend)
+
 ---
 
 ## 📋 Table des Matières
