@@ -202,13 +202,15 @@ const CustomersTable = ({ customers = [], isAdmin, onBillClick, onNewBill, onBil
         <div className="overflow-x-auto rounded-lg">
           <div className="inline-block min-w-full align-middle">
             <div className="overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">                <TableHeader
+              <table className="min-w-full divide-y divide-gray-200">
+                <TableHeader
                   showUserInfo={isAdmin}
                   onSelectAll={handleSelectAllBills}
                   isAllSelected={selectedBills.length > 0 && selectedBills.length === currentCustomers.length}
                   filters={filters}
                   onFilterChange={handleFilterChange}
-                />                <tbody className="bg-white divide-y divide-gray-200">
+                />
+                <tbody className="bg-white divide-y divide-gray-200">
                   {noFilterResults ? (
                     <tr>
                       <td colSpan={isAdmin ? 8 : 6} className="px-6 py-8 text-center">

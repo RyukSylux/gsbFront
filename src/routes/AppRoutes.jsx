@@ -24,6 +24,21 @@ const PrivateRoute = ({ children }) => {
   return children;
 };
 
+// Composant de protection des routes Admin
+const AdminRoute = ({ children }) => {
+  const { user, loading, isAdmin } = useAuth();
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (!user || !isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -40,9 +55,9 @@ const AppRoutes = () => {
       <Route
         path="/stats"
         element={
-          <PrivateRoute>
+          <AdminRoute>
             <Stats />
-          </PrivateRoute>
+          </AdminRoute>
         }
       />
       <Route

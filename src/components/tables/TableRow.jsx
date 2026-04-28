@@ -138,7 +138,8 @@ const TableRow = ({ customer, showUserInfo, onBillClick, isSelected, onSelect, o
         </td>
         <td className="w-24 px-6 py-4 whitespace-nowrap text-sm text-gray-500">
           {customer.amount ? `${customer.amount}€` : '-'}
-        </td>        <td className="w-24 px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        </td>
+        <td className="w-24 px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
           <div className="flex items-center justify-end space-x-3 text-right">
             <div className="relative inline-block">
               <button

@@ -91,7 +91,8 @@ const TableHeader = ({ showUserInfo, onSelectAll, isAllSelected, filters, onFilt
               className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm"
             />
           </FilterDropdown>
-        </th>          <th className="px-6 py-3 relative whitespace-nowrap">
+        </th>
+        <th className="px-6 py-3 relative whitespace-nowrap">
           {renderFilterButton('Créer le', 'createdAt')}
           <FilterDropdown isOpen={openFilter === 'createdAt'} onClose={() => setOpenFilter(null)}>
             <input

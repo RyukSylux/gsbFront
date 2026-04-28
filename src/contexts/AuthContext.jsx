@@ -41,10 +41,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    authAPI.clearTokens(); // Utilisation de la fonction clearTokens de l'API
-    setUser(null);
-    setIsAdmin(false);
+  const logout = async () => {
+    try {
+      await authAPI.logout();
+    } catch (err) {
+      console.error('Erreur lors de la déconnexion:', err);
+    } finally {
+      setUser(null);
+      setIsAdmin(false);
+    }
   };
 
   const register = async (userData) => {
