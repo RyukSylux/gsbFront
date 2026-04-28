@@ -100,11 +100,32 @@ Pour garantir une compatibilité universelle (notamment pour les utilisateurs **
 ---
 
 ## 📂 Structure du Projet
-- `src/components/` : Composants UI (Modales, Tableaux, Layout).
-- `src/services/` : Client API et logique OCR.
-- `src/contexts/` : Fournisseurs d'état (Auth, Notifications).
-- `src/pages/` : Vues principales (Dashboard, Stats, Login).
-- `src/hooks/` : Hooks personnalisés réutilisables.
+
+```text
+├── src/
+│   ├── components/
+│   │   ├── layout/         # Sidebar, Header, Footer, Navigation
+│   │   ├── modals/         # BillModal, NewBillModal, EditUserModal
+│   │   ├── tables/         # CustomersTable, UsersTable, TableControls
+│   │   └── ui/             # LoadingScreen, Notifications, Pagination
+│   ├── services/
+│   │   ├── api.jsx         # Instance Axios & appels API backend
+│   │   └── ocrService.js   # IA locale (Tesseract.js) & Analyse de texte
+│   ├── contexts/
+│   │   ├── AuthContext.jsx # Gestion de la session utilisateur
+│   │   └── NotificationContext.jsx # Système de toast notifications
+│   ├── pages/
+│   │   ├── Dashboard.jsx   # Liste principale des factures
+│   │   ├── Stats.jsx       # Analytics Admin (Graphiques Recharts)
+│   │   ├── Users.jsx       # CRUD Admin des utilisateurs
+│   │   ├── SignIn/SignUp   # Pages d'authentification
+│   │   └── UserSettings    # Gestion du profil utilisateur
+│   ├── hooks/              # Hooks personnalisés (ex: usePagination)
+│   ├── routes/             # AppRoutes.jsx (Routage React Router)
+│   └── main.jsx            # Point d'entrée React
+├── tailwind.config.js      # Configuration du design system
+└── vite.config.js          # Configuration de l'outil de build Vite
+```
 
 ---
 
