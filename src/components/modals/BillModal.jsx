@@ -35,7 +35,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
     switch (status) {
       case 'paid':
         return 'bg-green-100 text-green-800';
-      case 'remboursé':
+      case 'refunded':
         return 'bg-blue-100 text-blue-800';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
@@ -51,7 +51,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
     switch (status) {
       case 'paid':
         return 'Validé';
-      case 'remboursé':
+      case 'refunded':
         return 'Remboursé';
       case 'pending':
         return 'En attente';
@@ -348,7 +348,7 @@ const BillModal = ({ isOpen, onClose, onSave, initialData = null }) => {
                       <option value="pending">En attente</option>
                       <option value="paid">Validé</option>
                       <option value="not-paid">Refusé</option>
-                      <option value="remboursé">Remboursé</option>
+                      <option value="refunded">Remboursé</option>
                     </select>
                   ) : (
                     <div className="mt-1">

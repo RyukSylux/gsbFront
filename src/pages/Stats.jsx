@@ -31,7 +31,7 @@ const Stats = () => {
     switch (status) {
       case 'paid': 
         return { label: 'Validé', color: '#10b981', gradient: 'from-emerald-500 to-teal-600' };
-      case 'remboursé': 
+      case 'refunded': 
         return { label: 'Remboursé', color: '#4f46e5', gradient: 'from-blue-500 to-indigo-600' };
       case 'pending': 
         return { label: 'En attente', color: '#f59e0b', gradient: 'from-amber-400 to-orange-500' };
