@@ -74,7 +74,7 @@ const NotificationsContainer = () => {
   const { notifications } = useNotification();
   
   return (
-    <div className="fixed left-0 right-0 top-0 z-50 pointer-events-none">
+    <div className="fixed left-0 right-0 top-0 z-[9999] pointer-events-none">
       <div className="max-w-sm mx-auto px-4 sm:px-6 pt-20 sm:pt-24">
         <div className="space-y-4 pointer-events-auto">
           {notifications.map(notification => (
