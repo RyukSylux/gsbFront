@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
 import Sidebar from '../components/layout/Sidebar';
@@ -6,7 +7,8 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 
 const UserSettingsPage = () => {
-  const { user, login } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -75,18 +77,20 @@ const UserSettingsPage = () => {
     }
 
     setLoading(true);    try {
-      const updatedUser = await authAPI.updateUser(user.email, {
-        newEmail: formData.newEmail,
-        // On conserve les autres champs de l'utilisateur
+      await authAPI.updateUser(user.email, {
+        email: formData.newEmail,
         name: user.name,
         role: user.role
       });
-      setSuccess('Email mis à jour avec succès');
-      await login(updatedUser.email, formData.currentPassword);
-      setFormData(prev => ({
-        ...prev,
-        newEmail: ''
-      }));
+      
+      setSuccess('Email mis à jour avec succès. Redirection vers la page de connexion...');
+      
+      // On attend un peu pour que l'utilisateur puisse lire le message
+      setTimeout(async () => {
+        await logout();
+        navigate('/signin', { state: { message: 'Votre email a été mis à jour. Veuillez vous reconnecter.' } });
+      }, 2000);
+
     } catch (err) {
       setError(err.message);
     } finally {

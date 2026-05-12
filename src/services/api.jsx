@@ -111,23 +111,14 @@ export const authAPI = {
 
   updateUser: async (currentEmail, userData) => {
     try {
-      const transformedData = {};
-      if (userData.name) transformedData.name = userData.name;
-      if (userData.description) transformedData.description = userData.description;
-      if (userData.role) transformedData.role = userData.role;
+      const transformedData = { ...userData };
 
-      if (userData.email && userData.email !== currentEmail) {
-        transformedData.newEmail = userData.email;
+      // Si on a un champ 'email', on le prépare en 'newEmail' pour le contrôleur backend
+      if (userData.email && userData.email.trim() !== currentEmail.trim()) {
+        transformedData.newEmail = userData.email.trim();
       }
 
-      if (userData.newPassword) {
-        transformedData.newPassword = userData.newPassword;
-        if (userData.currentPassword) {
-          transformedData.currentPassword = userData.currentPassword;
-        }
-      }
-
-      const response = await api.put(`/users/${currentEmail}`, transformedData);
+      const response = await api.put(`/users/${encodeURIComponent(currentEmail)}`, transformedData);
       return response.data;
     } catch (error) {
         throw handleApiError(error);
